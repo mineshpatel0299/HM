@@ -13,9 +13,17 @@ export async function signup(formData: FormData): Promise<ActionResult> {
   const password = String(formData.get("password") ?? "");
   const displayName = String(formData.get("displayName") ?? "").trim();
   const timezone = String(formData.get("timezone") ?? "").trim();
+  const inviteCode = String(formData.get("inviteCode") ?? "").trim();
 
-  if (!email || !password || !displayName || !timezone) {
+  if (!email || !password || !displayName || !timezone || !inviteCode) {
     return { ok: false, error: "Fill in every field." };
+  }
+
+  // This app is built for exactly one couple — signup is closed to
+  // anyone who doesn't have the shared code, checked before anything
+  // else so a wrong code never even reaches the password/email checks.
+  if (inviteCode !== process.env.SIGNUP_INVITE_CODE) {
+    return { ok: false, error: "That invite code isn't right." };
   }
   if (password.length < 8) {
     return { ok: false, error: "Password needs to be at least 8 characters." };

@@ -79,7 +79,11 @@ environments (Development/Preview/Production) before a build will succeed.
 
 ## Access
 
-This app is built for exactly one couple and is not intended to accept
-public signups. Access-gating for `/signup` is tracked as outstanding work
-(see project TODOs) — until it lands, treat the deployed URL as unlisted
-rather than access-controlled.
+Signup requires `SIGNUP_INVITE_CODE` (see above) — anyone who doesn't have
+it can't create an account, regardless of the deployed URL being public.
+Share the code with your partner out of band (not over email/SMS in plain
+text if you can help it) so they can create their account and pair with
+your invite code from the home page afterward. These are two different
+codes: `SIGNUP_INVITE_CODE` gates account creation; the couple pairing
+code (shown on the home page once signed in) links two existing accounts
+together.

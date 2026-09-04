@@ -34,6 +34,18 @@ export default function SignupPage() {
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1">
+        <label htmlFor="inviteCode" className="font-sans text-xs text-ink/70">
+          invite code
+        </label>
+        <input
+          id="inviteCode"
+          name="inviteCode"
+          required
+          autoComplete="off"
+          className="rounded-xl border border-line bg-paper px-4 py-3 font-sans text-sm text-ink outline-none focus:border-ember"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
         <label htmlFor="displayName" className="font-sans text-xs text-ink/70">
           your name
         </label>
