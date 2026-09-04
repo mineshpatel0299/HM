@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
-import { scalePress, springSlow, useReducedMotionSafe } from "@/lib/motion";
+import { scalePress } from "@/lib/motion";
 import { searchCity, setMyLocation, type PartnerWeather } from "@/lib/weather/actions";
 import type { GeocodeResult } from "@/lib/weather/client";
 
@@ -19,7 +19,6 @@ export function WeatherBridge({
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
-  const { transition } = useReducedMotionSafe();
 
   function handleQueryChange(value: string) {
     setQuery(value);
@@ -45,13 +44,13 @@ export function WeatherBridge({
   }
 
   if (initialWeather) {
+    // No mount-entrance here: initialWeather is set once from server data
+    // and never changes, so this only ever renders at page-load — the same
+    // moment AppHome's own fadeRise is already animating this whole section
+    // in. A second, independently-timed fade nested inside that one reads
+    // as a stutter, not an extra flourish.
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={transition(springSlow)}
-        className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-lilac/30 to-paper2 px-5 py-4"
-      >
+      <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-lilac/30 to-paper2 px-5 py-4">
         <span className="text-3xl" aria-hidden="true">
           {initialWeather.emoji}
         </span>
@@ -62,7 +61,7 @@ export function WeatherBridge({
             {initialWeather.locationLabel ? ` (${initialWeather.locationLabel})` : ""}
           </p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
