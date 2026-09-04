@@ -5,7 +5,20 @@ import { getCoupleContext } from "@/lib/db/getCoupleContext";
 import { getDb, withDbRetry } from "@/lib/db/client";
 import { pings } from "@/lib/db/schema";
 import { triggerCoupleEvent } from "@/lib/realtime/pusherServer";
+import { sendPushToProfile } from "@/lib/push/send";
+import type { HapticPayload } from "./types";
 import type { PingEvent, PingKind, PingPayload } from "./types";
+
+function pushCopyForPing(kind: PingKind, fromName: string, payload: PingPayload): { title: string; body: string } {
+  if (kind === "haptic") {
+    const name = (payload as HapticPayload | null)?.name ?? "a pattern";
+    return { title: `${fromName} tapped out a pattern`, body: `"${name}" — open the app to feel it.` };
+  }
+  if (kind === "heartbeat") {
+    return { title: `${fromName} shared their heartbeat`, body: "open the app to feel it." };
+  }
+  return { title: `${fromName} sent a pulse`, body: "thinking of you." };
+}
 
 type SendPingResult = { ok: true } | { ok: false; error: string };
 
@@ -45,5 +58,9 @@ export async function sendPing(
   };
 
   await triggerCoupleEvent(coupleId, "ping:new", event);
+
+  const { title, body } = pushCopyForPing(kind, context.myName, payload);
+  await sendPushToProfile(context.partnerId, { title, body, url: "/connect" });
+
   return { ok: true };
 }

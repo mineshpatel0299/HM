@@ -194,6 +194,17 @@ export const unsentMessages = pgTable("unsent_messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  profileId: uuid("profile_id").notNull().references(() => profiles.id),
+  // One row per browser/device subscription, not per profile — the same
+  // person can have a phone and a laptop both wanting pushes.
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const scheduledNotes = pgTable("scheduled_notes", {
   id: uuid("id").primaryKey().defaultRandom(),
   coupleId: uuid("couple_id").notNull().references(() => couples.id),

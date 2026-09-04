@@ -50,6 +50,13 @@
       "when": 1788535813450,
       "tag": "0006_skinny_matthew_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788540087586,
+      "tag": "0007_milky_deathbird",
+      "breakpoints": true
     }
   ]
 }

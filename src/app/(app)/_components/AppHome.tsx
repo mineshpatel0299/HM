@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { fadeRise, useReducedMotionSafe } from "@/lib/motion";
 import { SectionDivider } from "@/components/ui/SectionDivider";
+import { PushNotifications } from "@/components/push/PushNotifications";
 
 // Hero is an async Server Component (it fetches status/weather itself), so
 // it can't be imported here directly — this file needs "use client" for
@@ -23,6 +24,8 @@ export function AppHome({ children }: { children: ReactNode }) {
         <p className="font-sans text-sm text-ink/70">you&apos;re both here now</p>
         <h1 className="font-display text-3xl">two skies, one thread</h1>
       </header>
+
+      <PushNotifications />
 
       <SectionDivider />
 

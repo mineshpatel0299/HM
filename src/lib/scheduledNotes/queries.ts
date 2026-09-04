@@ -3,6 +3,7 @@ import { and, desc, eq, lte } from "drizzle-orm";
 import { getDb, withDbRetry } from "@/lib/db/client";
 import { scheduledNotes } from "@/lib/db/schema";
 import { triggerCoupleEvent } from "@/lib/realtime/pusherServer";
+import { sendPushToProfile } from "@/lib/push/send";
 import type { ScheduledNote } from "./types";
 
 function toNote(row: typeof scheduledNotes.$inferSelect): ScheduledNote {
@@ -45,6 +46,11 @@ export async function getMyScheduledNotes(coupleId: string, myId: string): Promi
 
   for (const row of justSent) {
     await triggerCoupleEvent(coupleId, "note:delivered", toNote(row));
+    await sendPushToProfile(row.toId, {
+      title: "a note just arrived",
+      body: row.text.length > 120 ? `${row.text.slice(0, 117)}...` : row.text,
+      url: "/notes",
+    });
   }
 
   const rows = await withDbRetry(() =>
