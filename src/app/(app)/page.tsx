@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getCoupleContext } from "@/lib/db/getCoupleContext";
 import { Pairing } from "./_components/Pairing";
 import { AppHome } from "./_components/AppHome";
+import { WaitingForPartner } from "./_components/WaitingForPartner";
 import { Hero } from "@/components/hero/Hero";
 
 export default async function AppPage() {
@@ -17,9 +18,7 @@ export default async function AppPage() {
       {context.partnerName ? (
         <Hero context={context} />
       ) : (
-        <p className="font-sans text-sm text-ink/70">
-          waiting for them to join with your code.
-        </p>
+        <WaitingForPartner inviteCode={context.inviteCode} />
       )}
     </AppHome>
   );

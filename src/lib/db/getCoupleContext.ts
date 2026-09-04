@@ -7,6 +7,7 @@ import { couples, profiles } from "./schema";
 
 export type CoupleContext = {
   coupleId: string;
+  inviteCode: string;
   myId: string;
   partnerId: string | null;
   myName: string;
@@ -51,6 +52,7 @@ export const getCoupleContext = cache(async (): Promise<CoupleContext | null> =>
 
   return {
     coupleId: couple.id,
+    inviteCode: couple.inviteCode,
     myId,
     partnerId: partnerId ?? null,
     myName: me.displayName,
