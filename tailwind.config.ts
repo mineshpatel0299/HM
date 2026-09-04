@@ -9,8 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        ink: "#241934",
+        paper: "#FBF3E7",
+        paper2: "#F5ECDD",
+        ember: "#C4667B",
+        emberDark: "#A94F63",
+        amber: "#E8A45C",
+        lilac: "#B9A8D6",
+        sage: "#7C9473",
+        line: "rgba(36,25,52,0.14)",
+      },
+      fontFamily: {
+        display: ["var(--font-fraunces)", "serif"],
+        sans: ["var(--font-work-sans)", "ui-sans-serif", "sans-serif"],
       },
     },
   },

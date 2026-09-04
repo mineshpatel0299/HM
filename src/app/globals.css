@@ -2,22 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    @apply scroll-smooth;
   }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* One global rule instead of per-component focus classes — guarantees
+     every interactive element gets a visible ember ring on keyboard focus,
+     and nothing on mouse/touch (focus-visible, not focus). */
+  :focus-visible {
+    outline: 2px solid theme("colors.ember");
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {

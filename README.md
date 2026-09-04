@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Us, Anyway
 
-## Getting Started
+A private, two-person webapp for a long-distance couple — presence, daily
+rhythm, games, memories, and notes shared across two timezones. Not a public
+product: the whole app is built around exactly one couple.
 
-First, run the development server:
+## Stack
+
+- **Framework:** Next.js 14 (App Router), TypeScript strict
+- **Styling:** Tailwind, hand-built design system (no component library)
+- **Database:** Neon serverless Postgres + Drizzle ORM
+- **Auth:** Auth.js (NextAuth) v5, Credentials provider, JWT sessions
+- **Media storage:** Cloudflare R2 (S3-compatible), presigned URLs
+- **Realtime:** Pusher Channels
+- **Motion:** Framer Motion, with a shared reduced-motion-safe primitives layer
+- **Deployment:** Vercel
+
+## Local setup
 
 ```bash
+npm install
+cp .env.local.example .env.local   # fill in the values below
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Runs at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Migrations are managed with Drizzle Kit. These scripts source `.env.local`
+automatically:
 
-## Learn More
+```bash
+npm run db:generate   # generate a migration from schema changes
+npm run db:migrate     # apply migrations
+npm run db:studio      # browse the database
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See `.env.local.example` for the full list with comments. Summary:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Source |
+|---|---|
+| `AUTH_SECRET` | generate with `openssl rand -base64 33` |
+| `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PG*`, `POSTGRES_*` | Neon Postgres, provisioned via the **Vercel Marketplace** integration — run `vercel env pull .env.local` rather than hand-typing these |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` | Cloudflare R2 — created manually in the Cloudflare dashboard (not on the Vercel Marketplace). Create a bucket, a scoped "Object Read & Write" API token, and enable public access via the `r2.dev` subdomain (or a custom domain) |
+| `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER`, `NEXT_PUBLIC_PUSHER_KEY`, `NEXT_PUBLIC_PUSHER_CLUSTER` | Pusher Channels — created manually in the Pusher dashboard (not on the Vercel Marketplace). A Channels app on the Sandbox plan is enough for two users |
 
-## Deploy on Vercel
+### Provisioning Neon via Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+vercel link
+vercel integration add neon --yes
+vercel env pull .env.local --yes
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Provisioning R2 and Pusher
+
+Both are manual (no Vercel Marketplace integration for either):
+
+1. **R2** — Cloudflare dashboard → R2 → create a bucket → Manage R2 API
+   Tokens → create a token scoped to that bucket with Object Read & Write →
+   enable the bucket's public `r2.dev` URL (or attach a custom domain).
+2. **Pusher** — [dashboard.pusher.com](https://dashboard.pusher.com) → create
+   a Channels app → copy the app id/key/secret/cluster from the app's "App
+   Keys" tab.
+
+After provisioning either manually, add the values to the Vercel project's
+environment variables (`vercel env add <NAME>`) so they're present in
+Preview/Production, then `vercel env pull .env.local` again to sync locally.
+
+## Deployment
+
+Deployed on Vercel. Push to `main` for production, or open a PR for a
+preview deployment. Required environment variables must be set on the
+Vercel project (Settings → Environment Variables) for all three
+environments (Development/Preview/Production) before a build will succeed.
+
+## Access
+
+This app is built for exactly one couple and is not intended to accept
+public signups. Access-gating for `/signup` is tracked as outstanding work
+(see project TODOs) — until it lands, treat the deployed URL as unlisted
+rather than access-controlled.
