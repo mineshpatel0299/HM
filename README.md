@@ -43,9 +43,11 @@ See `.env.local.example` for the full list with comments. Summary:
 | Variable | Source |
 |---|---|
 | `AUTH_SECRET` | generate with `openssl rand -base64 33` |
+| `SIGNUP_INVITE_CODE` | generate with `openssl rand -hex 12` — gates account creation, see [Access](#access) below |
 | `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PG*`, `POSTGRES_*` | Neon Postgres, provisioned via the **Vercel Marketplace** integration — run `vercel env pull .env.local` rather than hand-typing these |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` | Cloudflare R2 — created manually in the Cloudflare dashboard (not on the Vercel Marketplace). Create a bucket, a scoped "Object Read & Write" API token, and enable public access via the `r2.dev` subdomain (or a custom domain) |
 | `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER`, `NEXT_PUBLIC_PUSHER_KEY`, `NEXT_PUBLIC_PUSHER_CLUSTER` | Pusher Channels — created manually in the Pusher dashboard (not on the Vercel Marketplace). A Channels app on the Sandbox plan is enough for two users |
+| `VAPID_SUBJECT`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Web Push — generate with `npx web-push generate-vapid-keys`. `VAPID_SUBJECT` is a `mailto:` or `https:` URL identifying the sender |
 
 ### Provisioning Neon via Vercel
 
@@ -72,10 +74,13 @@ Preview/Production, then `vercel env pull .env.local` again to sync locally.
 
 ## Deployment
 
-Deployed on Vercel. Push to `main` for production, or open a PR for a
-preview deployment. Required environment variables must be set on the
-Vercel project (Settings → Environment Variables) for all three
-environments (Development/Preview/Production) before a build will succeed.
+Deployed on Vercel at [us-anyway.vercel.app](https://us-anyway.vercel.app).
+The GitHub repo is connected to the Vercel project, so pushing to `main`
+deploys to production and opening a PR gets a preview deployment
+automatically. Required environment variables must be set on the Vercel
+project (Settings → Environment Variables) for all three environments
+(Development/Preview/Production) before a build will succeed — `vercel env
+add <NAME> <environment>` from the CLI, or the dashboard.
 
 ## Access
 
