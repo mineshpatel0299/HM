@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply scroll-smooth;
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      @apply scroll-smooth;
+    }
   }
 
   /* One global rule instead of per-component focus classes — guarantees
@@ -13,6 +15,15 @@
   :focus-visible {
     outline: 2px solid theme("colors.ember");
     outline-offset: 2px;
+  }
+
+  /* Tailwind's animate-pulse (used by loading skeletons) doesn't check
+     prefers-reduced-motion on its own — this makes it a static state
+     instead of an animation, everywhere it's used. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse {
+      animation: none;
+    }
   }
 }
 
