@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ChangeEvent } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { scalePress, springSoft, useReducedMotionSafe } from "@/lib/motion";
 import { useUpload } from "@/lib/storage/useUpload";
