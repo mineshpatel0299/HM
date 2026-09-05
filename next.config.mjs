@@ -1,13 +1,20 @@
 const r2Hostname = process.env.R2_PUBLIC_URL
-  ? new URL(process.env.R2_PUBLIC_URL).hostname
+  ? (() => {
+      try {
+        return new URL(process.env.R2_PUBLIC_URL).hostname;
+      } catch {
+        return undefined;
+      }
+    })()
   : undefined;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: r2Hostname
-      ? [{ protocol: "https", hostname: r2Hostname }]
-      : [],
+    remotePatterns: [
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
+    ],
   },
 };
 

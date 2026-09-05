@@ -7,6 +7,7 @@ import { scalePress, springSoft, useReducedMotionSafe } from "@/lib/motion";
 import { useUpload } from "@/lib/storage/useUpload";
 import { UploadProgress } from "@/components/ui/UploadProgress";
 import { addPhoto } from "@/lib/photos/actions";
+import { MemoryPhotoCard } from "@/components/media/MemoryPhotoCard";
 import type { Photo } from "@/lib/photos/types";
 
 // Independent per-photo tilt so the grid reads as a scattered scrapbook
@@ -91,7 +92,7 @@ export function PhotoAlbum({
               style={{ rotate: ROTATIONS[index % ROTATIONS.length] }}
               className="relative aspect-square overflow-hidden rounded-xl border border-line bg-paper2 shadow-sm"
             >
-              <Image src={photo.publicUrl} alt={photo.caption ?? ""} fill className="object-cover" />
+              <MemoryPhotoCard src={photo.publicUrl} alt={photo.caption ?? ""} />
             </motion.button>
           ))}
         </div>
@@ -125,7 +126,7 @@ export function PhotoAlbum({
                 ×
               </button>
               <div className="relative aspect-square w-full">
-                <Image src={selected.publicUrl} alt={selected.caption ?? ""} fill className="object-cover" />
+                <MemoryPhotoCard src={selected.publicUrl} alt={selected.caption ?? ""} />
               </div>
               {selected.caption && (
                 <p className="px-4 py-3 font-sans text-sm text-ink">{selected.caption}</p>

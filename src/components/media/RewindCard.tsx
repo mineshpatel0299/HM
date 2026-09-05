@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { fadeRise, useReducedMotionSafe } from "@/lib/motion";
+import { MemoryPhotoCard } from "@/components/media/MemoryPhotoCard";
 import type { RewindItem } from "@/lib/rewind/types";
 
 function weeksAgoLabel(dateKey: string): string {
@@ -33,7 +33,7 @@ function RewindBody({
     return (
       <div className="flex flex-col gap-2">
         <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-          <Image src={item.publicUrl} alt={item.caption ?? ""} fill className="object-cover" />
+          <MemoryPhotoCard src={item.publicUrl} alt={item.caption ?? ""} />
         </div>
         {item.caption && <p className="font-sans text-sm text-ink/80">{item.caption}</p>}
       </div>

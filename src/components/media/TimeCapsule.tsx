@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, type ChangeEvent } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { scalePress, sealBreak, useReducedMotionSafe } from "@/lib/motion";
 import { useUpload } from "@/lib/storage/useUpload";
 import { UploadProgress } from "@/components/ui/UploadProgress";
 import { createTimeCapsule } from "@/lib/timecapsules/actions";
+import { MemoryPhotoCard } from "@/components/media/MemoryPhotoCard";
 import type { TimeCapsule as TimeCapsuleRow } from "@/lib/timecapsules/types";
 
 const AUDIO_EXT = /\.(mp3|wav|m4a|webm|ogg|aac)$/i;
@@ -174,7 +174,7 @@ function CapsuleCard({
       )}
       {capsule.publicUrl && !isAudio && (
         <div className="relative mt-2 aspect-video w-full overflow-hidden rounded-lg">
-          <Image src={capsule.publicUrl} alt="" fill className="object-cover" />
+          <MemoryPhotoCard src={capsule.publicUrl} alt="" />
         </div>
       )}
     </div>
