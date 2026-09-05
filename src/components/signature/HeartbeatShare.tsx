@@ -7,6 +7,7 @@ import { useRealtimeEvent } from "@/lib/realtime/RealtimeProvider";
 import { sendPing } from "@/lib/pings/actions";
 import { detectBpm, type BrightnessSample } from "@/lib/heartbeat/detectBpm";
 import type { HeartbeatPayload, PingEvent } from "@/lib/pings/types";
+import { Heart, Activity, Camera, RefreshCw, AlertCircle } from "lucide-react";
 
 const SAMPLE_INTERVAL_MS = 50;
 const SAMPLE_WINDOW_MS = 15_000;
@@ -18,18 +19,17 @@ type CaptureState = "idle" | "requesting" | "sampling" | "processing" | "done" |
 function friendlyCameraError(error: unknown): string {
   const name = error instanceof DOMException ? error.name : "";
   if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "camera access was denied — allow it in your browser's site settings and try again.";
+    return "Camera access was denied — allow camera permissions in browser settings.";
   }
   if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-    return "no camera found on this device.";
+    return "No camera found on this device.";
   }
   if (name === "NotReadableError") {
-    return "the camera's in use by something else right now — close other apps using it and try again.";
+    return "Camera is in use by another app right now.";
   }
-  return "couldn't access the camera — try again.";
+  return "Could not access camera — please try again.";
 }
 
-/** Sender-side capture UI. */
 function HeartbeatCapture({ coupleId }: { coupleId: string }) {
   const [state, setState] = useState<CaptureState>("idle");
   const [secondsLeft, setSecondsLeft] = useState(SAMPLE_WINDOW_MS / 1000);
@@ -80,7 +80,7 @@ function HeartbeatCapture({ coupleId }: { coupleId: string }) {
 
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) {
-      setErrorMessage("this browser can't process the camera feed.");
+      setErrorMessage("This browser cannot process the camera feed.");
       setState("error");
       stopCamera();
       return;
@@ -102,9 +102,6 @@ function HeartbeatCapture({ coupleId }: { coupleId: string }) {
       const avgRed = redSum / pixelCount;
       samplesRef.current.push({ t, value: avgRed });
 
-      // Live pulse: re-run the same detector on just the last ~3s so the
-      // heart on screen roughly tracks real beats as they're found, without
-      // duplicating the peak-detection logic.
       const recent = samplesRef.current.filter((s) => t - s.t <= LIVE_WINDOW_MS);
       const live = detectBpm(recent);
       if (live) {
@@ -132,9 +129,7 @@ function HeartbeatCapture({ coupleId }: { coupleId: string }) {
 
     const detected = detectBpm(samplesRef.current);
     if (!detected) {
-      setErrorMessage(
-        "couldn't get a clear reading — hold your fingertip fully over the camera, keep still, and try again.",
-      );
+      setErrorMessage("Could not get a clear pulse reading — cover camera lens completely with your fingertip.");
       setState("error");
       return;
     }
@@ -152,82 +147,84 @@ function HeartbeatCapture({ coupleId }: { coupleId: string }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {/* off-screen capture surfaces */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+    <div className="flex flex-col items-center gap-4 text-center">
       <video ref={videoRef} playsInline muted className="hidden" />
       <canvas ref={canvasRef} width={CAPTURE_SIZE} height={CAPTURE_SIZE} className="hidden" />
 
       <motion.div
-        animate={{ scale: livePulse ? 1.2 : 1 }}
+        animate={{ scale: livePulse ? 1.25 : 1 }}
         transition={transition(springSnappy)}
-        className="flex h-28 w-28 items-center justify-center rounded-full bg-emberDark text-4xl text-paper"
+        className="flex h-24 w-24 items-center justify-center rounded-full gradient-btn text-white shadow-xl shadow-ember/30 my-1"
         aria-hidden="true"
       >
-        💓
+        <Heart className={`h-10 w-10 fill-white/40 ${livePulse ? "animate-ping" : ""}`} />
       </motion.div>
 
       {state === "idle" && (
         <>
-          <p className="max-w-xs text-center font-sans text-sm text-ink/70">
-            cover your camera lens completely with a fingertip, then start —
-            it takes about 15 seconds.
+          <p className="max-w-xs font-sans text-xs text-ink-muted leading-relaxed">
+            Cover your camera lens completely with your fingertip, then start (~15s scan).
           </p>
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={handleStart}
-            className="rounded-2xl bg-emberDark px-5 py-3 font-sans text-sm text-paper"
+            className="flex items-center gap-2 rounded-2xl gradient-btn px-6 py-3 font-sans text-xs font-semibold text-white shadow-md"
           >
-            start
+            <Camera className="h-4 w-4" />
+            <span>Measure Pulse</span>
           </motion.button>
         </>
       )}
 
       {state === "requesting" && (
-        <p className="font-sans text-sm text-ink/70">asking for camera access…</p>
+        <p className="font-sans text-xs text-ink-muted animate-pulse">Requesting camera access...</p>
       )}
 
       {state === "sampling" && (
-        <p className="font-sans text-sm text-ink/70">
-          hold still — {secondsLeft}s left
-        </p>
+        <div className="flex flex-col gap-1 items-center">
+          <span className="font-display text-2xl font-bold text-ember">{secondsLeft}s</span>
+          <p className="font-sans text-xs text-ink-muted">Hold your fingertip still over camera...</p>
+        </div>
       )}
 
       {state === "processing" && (
-        <p className="font-sans text-sm text-ink/70">reading your pulse…</p>
+        <p className="font-sans text-xs text-ink-muted animate-pulse">Analyzing pulse waveform...</p>
       )}
 
       {state === "error" && (
         <>
-          <p className="max-w-xs text-center font-sans text-sm text-emberDark">{errorMessage}</p>
+          <div className="flex items-center gap-2 rounded-xl bg-rose-500/10 p-3 text-xs text-rose-700 border border-rose-500/20 max-w-xs font-sans font-medium">
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
+            <span>{errorMessage}</span>
+          </div>
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={handleStart}
-            className="rounded-2xl bg-emberDark px-5 py-3 font-sans text-sm text-paper"
+            className="flex items-center gap-1.5 rounded-2xl gradient-btn px-5 py-2.5 font-sans text-xs font-semibold text-white shadow-md"
           >
-            try again
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Try Again</span>
           </motion.button>
         </>
       )}
 
       {state === "done" && result && (
-        <>
-          <p className="font-display text-3xl text-ink">{result.bpm} bpm</p>
-          <p className="font-sans text-sm text-ink">sent to your partner.</p>
+        <div className="flex flex-col items-center gap-2">
+          <span className="font-display text-3xl font-bold text-ink">{result.bpm} BPM</span>
+          <span className="text-xs font-sans text-emerald-700 font-medium">Pulse sent to partner!</span>
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => setState("idle")}
-            className="rounded-full border border-line px-4 py-2 font-sans text-xs text-ink"
+            className="rounded-xl border border-line bg-white/70 px-4 py-2 font-sans text-xs font-medium text-ink hover:bg-paper2"
           >
-            share again
+            Share Again
           </motion.button>
-        </>
+        </div>
       )}
     </div>
   );
 }
 
-/** Receiving-side playback, driven by the partner's actual captured rhythm. */
 function HeartbeatReceiver({ myId, partnerName }: { myId: string; partnerName: string }) {
   const [incoming, setIncoming] = useState<HeartbeatPayload | null>(null);
   const controls = useAnimation();
@@ -257,8 +254,8 @@ function HeartbeatReceiver({ myId, partnerName }: { myId: string; partnerName: s
 
   if (!incoming) {
     return (
-      <p className="font-sans text-sm text-ink/70">
-        nothing shared yet — ask {partnerName} to share their heartbeat.
+      <p className="font-sans text-xs text-ink-muted italic">
+        No heartbeat received yet — ask {partnerName} to measure theirs!
       </p>
     );
   }
@@ -267,19 +264,21 @@ function HeartbeatReceiver({ myId, partnerName }: { myId: string; partnerName: s
     <div className="flex flex-col items-center gap-3">
       <motion.div
         animate={controls}
-        className="flex h-28 w-28 items-center justify-center rounded-full bg-emberDark text-4xl text-paper"
+        className="flex h-20 w-20 items-center justify-center rounded-full gradient-btn text-white shadow-xl shadow-ember/30"
         aria-hidden="true"
       >
-        💓
+        <Heart className="h-8 w-8 fill-white/40" />
       </motion.div>
-      <p className="font-display text-2xl text-ink">{incoming.bpm} bpm</p>
-      <p className="font-sans text-sm text-ink/70">{partnerName}&apos;s heartbeat</p>
+      <div className="flex flex-col items-center">
+        <span className="font-display text-2xl font-bold text-ink">{incoming.bpm} BPM</span>
+        <span className="text-xs font-sans text-ink-muted">{partnerName}&apos;s live pulse</span>
+      </div>
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => play(incoming)}
-        className="rounded-full border border-line px-4 py-2 font-sans text-xs text-ink"
+        className="rounded-xl border border-line bg-white/70 px-3.5 py-1.5 font-sans text-xs font-semibold text-ink hover:bg-paper2"
       >
-        play again
+        Replay Pulse
       </motion.button>
     </div>
   );
@@ -295,14 +294,20 @@ export function HeartbeatShare({
   partnerName: string;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-8">
-      <div className="flex flex-col items-center gap-3">
-        <h2 className="font-display text-2xl">share your heartbeat</h2>
-        <HeartbeatCapture coupleId={coupleId} />
+    <div className="flex flex-col gap-6 rounded-3xl glass-card p-6 border border-white/80 shadow-glass">
+      <div className="flex items-center gap-2 pb-2 border-b border-line">
+        <Activity className="h-5 w-5 text-ember" />
+        <h2 className="font-display text-lg font-bold text-ink">Heartbeat Sync</h2>
       </div>
-      <div className="border-t border-dashed border-line pt-6">
-        <h3 className="mb-3 text-center font-display text-xl">{partnerName}&apos;s turn</h3>
-        <HeartbeatReceiver myId={myId} partnerName={partnerName} />
+
+      <div className="flex flex-col gap-6">
+        <HeartbeatCapture coupleId={coupleId} />
+        <div className="pt-4 border-t border-line text-center flex flex-col items-center gap-3">
+          <span className="text-xs font-sans font-bold uppercase tracking-wider text-ink-muted">
+            {partnerName}&apos;s Heartbeat
+          </span>
+          <HeartbeatReceiver myId={myId} partnerName={partnerName} />
+        </div>
       </div>
     </div>
   );

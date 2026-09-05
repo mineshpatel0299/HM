@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { reveal, scalePress, useReducedMotionSafe } from "@/lib/motion";
 import { useMutualReveal } from "@/lib/reveal/useMutualReveal";
 import { submitSparkAnswer } from "@/lib/spark/actions";
-import { JournalCard } from "@/components/ui/JournalCard";
+import { MessageSquareHeart, Send, Lock, Eye } from "lucide-react";
 
 export function SparkCard({
   coupleId,
@@ -44,18 +44,24 @@ export function SparkCard({
   }
 
   return (
-    <JournalCard corner="a" animateIn={false} className="flex flex-col gap-4">
-      <p className="font-sans text-xs text-ink/70">today&apos;s spark</p>
-      <p className="font-display text-xl text-ink">{promptText}</p>
+    <div className="flex flex-col gap-4 rounded-3xl glass-card p-6 border border-white/80 shadow-glass">
+      <div className="flex items-center gap-2">
+        <MessageSquareHeart className="h-5 w-5 text-ember" />
+        <span className="text-xs font-sans font-bold uppercase tracking-wider text-ember">
+          Daily Spark Prompt
+        </span>
+      </div>
+
+      <p className="font-display text-xl font-bold text-ink leading-snug">{promptText}</p>
 
       {mine === null ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             rows={3}
-            placeholder="your answer..."
-            className="rounded-xl border border-line bg-paper px-3 py-2 font-sans text-sm text-ink outline-none focus:border-ember"
+            placeholder="Write your honest reflection..."
+            className="w-full rounded-2xl glass-input p-4 font-sans text-xs text-ink placeholder:text-ink-muted outline-none"
           />
           <motion.button
             variants={scalePress}
@@ -63,32 +69,41 @@ export function SparkCard({
             whileTap="tap"
             onClick={handleSubmit}
             disabled={isSubmitting || !draft.trim()}
-            className="self-start rounded-full bg-emberDark px-4 py-2 font-sans text-xs text-paper disabled:opacity-50"
+            className="self-end flex items-center gap-1.5 rounded-2xl gradient-btn px-5 py-2.5 font-sans text-xs font-semibold text-white shadow-md disabled:opacity-50"
           >
-            {isSubmitting ? "sending…" : "answer"}
+            <span>{isSubmitting ? "Submitting..." : "Submit Answer"}</span>
+            <Send className="h-3.5 w-3.5" />
           </motion.button>
         </div>
       ) : !bothRevealed ? (
-        <p className="font-sans text-sm text-ink/70">
-          you answered — waiting on {partnerName}…
-        </p>
+        <div className="flex items-center gap-3 rounded-2xl bg-amber/10 p-4 border border-amber/20 text-amber text-xs font-sans font-medium">
+          <Lock className="h-4 w-4 shrink-0 text-amber" />
+          <span>You submitted your answer! Waiting for <strong className="text-ink">{partnerName}</strong> to answer to reveal both.</span>
+        </div>
       ) : (
         <motion.div
           variants={variants(reveal)}
           initial="hidden"
           animate="visible"
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-4 pt-2 border-t border-line"
         >
-          <div>
-            <p className="font-sans text-xs text-ink/70">you</p>
-            <p className="font-sans text-sm text-ink">{mine}</p>
+          <div className="flex items-center gap-1.5 text-xs font-sans font-bold text-emerald-700">
+            <Eye className="h-4 w-4 text-emerald-500" />
+            <span>Mutual Reveal Unlocked!</span>
           </div>
-          <div>
-            <p className="font-sans text-xs text-ink/70">{partnerName}</p>
-            <p className="font-sans text-sm text-ink">{partner}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-white/80 p-4 border border-line flex flex-col gap-1">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-ember">You</span>
+              <p className="font-sans text-xs text-ink">{mine}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4 border border-line flex flex-col gap-1">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-amber">{partnerName}</span>
+              <p className="font-sans text-xs text-ink">{partner}</p>
+            </div>
           </div>
         </motion.div>
       )}
-    </JournalCard>
+    </div>
   );
 }

@@ -1,7 +1,11 @@
 import type { MilestoneRow } from "@/lib/milestones/queries";
+import { Flame, Award, Trophy } from "lucide-react";
 
-function badgeIcon(milestone: MilestoneRow): string {
-  return milestone.isStreak ? "🔥" : "🏵";
+function badgeIcon(milestone: MilestoneRow) {
+  if (milestone.isStreak) {
+    return <Flame className="h-4 w-4 text-amber fill-amber animate-pulse" />;
+  }
+  return <Award className="h-4 w-4 text-ember fill-ember/20" />;
 }
 
 function badgeLabel(milestone: MilestoneRow): string {
@@ -11,32 +15,31 @@ function badgeLabel(milestone: MilestoneRow): string {
   return milestone.label;
 }
 
-/** A strip of small stamped badges, not a progress bar — each milestone is
- * a discrete, already-achieved thing, not a metric climbing toward a goal. */
 export function MilestoneTicker({ milestones }: { milestones: MilestoneRow[] }) {
   if (milestones.length === 0) return null;
 
-  // Plain divs, not motion.div: this only ever mounts at page-load, the
-  // same moment AppHome's own fadeRise is already animating this whole
-  // section in — a second, per-badge entrance nested inside that one is
-  // redundant, not an extra flourish (same reasoning as StatCard's
-  // JournalCard animateIn={false}).
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1">
-      {milestones.map((milestone, index) => (
-        <div
-          key={milestone.id}
-          style={{ rotate: `${index % 2 === 0 ? -2 : 2}deg` }}
-          className="flex shrink-0 flex-col items-center gap-1 rounded-xl border border-line bg-paper2 px-3 py-2 shadow-sm"
-        >
-          <span className="text-lg" aria-hidden="true">
+    <div className="flex flex-col gap-2.5 rounded-3xl glass-card p-5 border border-white/80 shadow-glass">
+      <div className="flex items-center gap-2">
+        <Trophy className="h-4 w-4 text-amber" />
+        <span className="text-xs font-sans font-bold uppercase tracking-wider text-ink-muted">
+          Unlocked Milestones
+        </span>
+      </div>
+
+      <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
+        {milestones.map((milestone) => (
+          <div
+            key={milestone.id}
+            className="flex shrink-0 items-center gap-2 rounded-2xl bg-paper2/90 border border-line px-3.5 py-2 shadow-sm hover:border-ember/30 transition-colors"
+          >
             {badgeIcon(milestone)}
-          </span>
-          <span className="whitespace-nowrap font-sans text-xs text-ink/70">
-            {badgeLabel(milestone)}
-          </span>
-        </div>
-      ))}
+            <span className="whitespace-nowrap font-sans text-xs font-semibold text-ink">
+              {badgeLabel(milestone)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

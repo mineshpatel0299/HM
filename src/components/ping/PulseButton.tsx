@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ripple, scalePress, useReducedMotionSafe } from "@/lib/motion";
 import { sendPing } from "@/lib/pings/actions";
+import { Heart } from "lucide-react";
 
 export function PulseButton({ coupleId }: { coupleId: string }) {
   const [isSending, setIsSending] = useState(false);
@@ -25,14 +26,24 @@ export function PulseButton({ coupleId }: { coupleId: string }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative flex h-16 w-16 items-center justify-center">
+    <div className="flex flex-col items-center gap-4 rounded-3xl glass-card p-6 text-center border border-white/80 shadow-glass">
+      <div className="flex flex-col gap-1">
+        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-ember">
+          Instant Pulse
+        </span>
+        <h3 className="font-display text-xl font-bold text-ink">Send a Nudge</h3>
+        <p className="font-sans text-xs text-ink-muted">
+          Tap the heart to let your partner feel your presence right now.
+        </p>
+      </div>
+
+      <div className="relative flex h-24 w-24 items-center justify-center my-2">
         {showRipple && (
           <motion.span
             variants={variants(ripple)}
             initial="initial"
             animate="animate"
-            className="absolute h-16 w-16 rounded-full bg-ember/40"
+            className="absolute h-24 w-24 rounded-full bg-gradient-to-tr from-ember/40 to-amber/40 shadow-glow"
             aria-hidden="true"
           />
         )}
@@ -42,13 +53,14 @@ export function PulseButton({ coupleId }: { coupleId: string }) {
           whileTap="tap"
           onClick={handlePress}
           disabled={isSending}
-          aria-label="send a ping"
-          className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-emberDark font-display text-2xl text-paper shadow-sm disabled:opacity-70"
+          aria-label="Send a instant ping"
+          className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full gradient-btn text-white shadow-xl shadow-ember/30 disabled:opacity-70 group"
         >
-          ♥
+          <Heart className="h-9 w-9 fill-white/30 group-hover:scale-110 transition-transform duration-300 animate-heartbeat" />
         </motion.button>
       </div>
-      {error && <p className="font-sans text-xs text-emberDark">{error}</p>}
+
+      {error && <p className="font-sans text-xs text-rose-600 font-medium">{error}</p>}
     </div>
   );
 }

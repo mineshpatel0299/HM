@@ -3,19 +3,21 @@ import { getCoupleContext } from "@/lib/db/getCoupleContext";
 import { getJarState } from "@/lib/jar/queries";
 import { getUnsentVaultState } from "@/lib/unsent/queries";
 import { getMyScheduledNotes } from "@/lib/scheduledNotes/queries";
-import { SectionDivider } from "@/components/ui/SectionDivider";
 import { Jar } from "@/components/jar/Jar";
 import { UnsentVault } from "@/components/jar/UnsentVault";
 import { ScheduledNotes } from "@/components/jar/ScheduledNotes";
+import { Feather } from "lucide-react";
 
 export default async function NotesPage() {
   const context = await getCoupleContext();
   if (!context) redirect("/");
   if (!context.partnerId || !context.partnerName) {
     return (
-      <p className="mx-auto max-w-sm text-center font-sans text-sm text-ink/70">
-        waiting for your partner to join before there&apos;s anyone to leave notes for.
-      </p>
+      <div className="mx-auto max-w-md rounded-3xl glass-card p-6 text-center border border-white/80 shadow-glass">
+        <p className="font-sans text-xs font-semibold text-ink-muted">
+          Waiting for your partner to join before leaving notes.
+        </p>
+      </div>
     );
   }
 
@@ -26,14 +28,26 @@ export default async function NotesPage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-10">
-      <header className="flex flex-col gap-1">
-        <p className="font-sans text-sm text-ink/70">the quiet ones</p>
-        <h1 className="font-display text-3xl">notes</h1>
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-8">
+      {/* Header Banner */}
+      <header className="flex items-center justify-between gap-4 p-5 rounded-3xl glass-card border border-white/80 shadow-glass">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className="font-sans text-xs font-semibold tracking-wider text-amber uppercase">Quiet Words</span>
+            <span className="h-1 w-1 rounded-full bg-amber" />
+            <span className="font-sans text-xs text-ink-muted">Memory Vault</span>
+          </div>
+          <h1 className="font-display text-2xl sm:text-3xl text-ink font-semibold tracking-tight">
+            Notes &amp; Jar
+          </h1>
+        </div>
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber/10 border border-amber/20 text-amber">
+          <Feather className="h-6 w-6" />
+        </div>
       </header>
 
-      <div className="flex flex-col gap-2">
-        <h2 className="font-display text-xl text-ink">the jar</h2>
+      {/* Main Note Modules */}
+      <div className="flex flex-col gap-8">
         <Jar
           coupleId={context.coupleId}
           myId={context.myId}
@@ -41,24 +55,14 @@ export default async function NotesPage() {
           partnerName={context.partnerName}
           initialUnopenedCount={jarState.unopenedCount}
         />
-      </div>
 
-      <SectionDivider offset="right" />
-
-      <div className="flex flex-col gap-2">
-        <h2 className="font-display text-xl text-ink">unsent messages</h2>
         <UnsentVault
           coupleId={context.coupleId}
           partnerName={context.partnerName}
           initialMine={vaultState.mine}
           initialFromPartner={vaultState.fromPartner}
         />
-      </div>
 
-      <SectionDivider offset="left" />
-
-      <div className="flex flex-col gap-2">
-        <h2 className="font-display text-xl text-ink">scheduled notes</h2>
         <ScheduledNotes
           coupleId={context.coupleId}
           myId={context.myId}

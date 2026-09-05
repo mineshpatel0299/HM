@@ -4,30 +4,44 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { formatInTimeZone } from "date-fns-tz";
 import { springSlow, useReducedMotionSafe } from "@/lib/motion";
+import { Sun, Moon, Clock } from "lucide-react";
 
 function isDaytime(date: Date, timeZone: string): boolean {
   const hour = Number(formatInTimeZone(date, timeZone, "H"));
   return hour >= 6 && hour < 18;
 }
 
-// 1 (rough day) through 5 (great day) — reusing existing theme tokens, no
-// new colors introduced for this.
-const MOOD_DOT_COLOR: Record<number, string> = {
-  1: "bg-emberDark",
-  2: "bg-ember",
-  3: "bg-amber",
-  4: "bg-lilac",
-  5: "bg-sage",
+const MOOD_DOT_COLOR: Record<number, { bg: string; border: string; label: string }> = {
+  1: { bg: "bg-rose-600", border: "border-rose-400", label: "Rough day" },
+  2: { bg: "bg-amber-500", border: "border-amber-300", label: "Tired" },
+  3: { bg: "bg-blue-400", border: "border-blue-300", label: "Okay" },
+  4: { bg: "bg-emerald-400", border: "border-emerald-300", label: "Good" },
+  5: { bg: "bg-pink-400", border: "border-pink-300", label: "Radiant" },
 };
+
+function getTimeDifference(tz1: string, tz2: string): string {
+  const now = new Date();
+  const dateStr1 = formatInTimeZone(now, tz1, "yyyy-MM-dd HH:mm");
+  const dateStr2 = formatInTimeZone(now, tz2, "yyyy-MM-dd HH:mm");
+  const date1 = new Date(dateStr1);
+  const date2 = new Date(dateStr2);
+  const diffHours = (date2.getTime() - date1.getTime()) / (1000 * 60 * 60);
+  const rounded = Math.round(diffHours * 10) / 10;
+  if (rounded === 0) return "Same timezone";
+  if (rounded > 0) return `${rounded}h ahead`;
+  return `${Math.abs(rounded)}h behind`;
+}
 
 function SkyBadge({
   label,
   timezone,
   moodScore,
+  isPartner = false,
 }: {
   label: string;
   timezone: string;
   moodScore?: number | null;
+  isPartner?: boolean;
 }) {
   const [now, setNow] = useState<Date | null>(null);
   const { transition } = useReducedMotionSafe();
@@ -39,44 +53,70 @@ function SkyBadge({
   }, []);
 
   if (!now) {
-    // Avoids a server/client render mismatch — the server has no notion of
-    // "now" for a specific timezone until this mounts client-side.
-    return <div className="h-28 w-28 rounded-full bg-paper2" aria-hidden="true" />;
+    return (
+      <div className="flex flex-col items-center justify-center h-32 w-32 rounded-3xl bg-paper2/50 animate-pulse border border-line" />
+    );
   }
 
   const day = isDaytime(now, timezone);
-  const time = formatInTimeZone(now, timezone, "h:mm a");
+  const time = formatInTimeZone(now, timezone, "h:mm");
+  const ampm = formatInTimeZone(now, timezone, "a");
 
   return (
-    // Outer wrapper is NOT overflow-hidden — a circular clip-mask cuts away
-    // exactly the corner area where a status dot would go (a circle never
-    // reaches the corners of its bounding square), so the dot has to live
-    // outside the clipped inner circle, not inside it.
-    <div className="relative h-28 w-28 shrink-0">
-      <div className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full text-center">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-b from-amber to-paper"
-          animate={{ opacity: day ? 1 : 0 }}
-          transition={transition(springSlow)}
-        />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-b from-ink to-lilac"
-          animate={{ opacity: day ? 0 : 1 }}
-          transition={transition(springSlow)}
-        />
-        <div className="relative flex flex-col items-center gap-0.5">
-          <span className="text-xl" aria-hidden="true">
-            {day ? "☀️" : "🌙"}
+    <div className="relative flex flex-col items-center justify-center h-32 w-32 rounded-3xl p-3 text-center transition-transform hover:scale-[1.02] shadow-glass border border-white/80 overflow-hidden group">
+      {/* Dynamic Background Gradients */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-b from-amber/20 via-orange-100/40 to-paper"
+        animate={{ opacity: day ? 1 : 0 }}
+        transition={transition(springSlow)}
+      />
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white"
+        animate={{ opacity: day ? 0 : 1 }}
+        transition={transition(springSlow)}
+      />
+
+      {/* Decorative Sky Glow */}
+      <div
+        className={`absolute -top-6 -right-6 h-16 w-16 rounded-full blur-xl ${
+          day ? "bg-amber-400/30" : "bg-indigo-400/30"
+        }`}
+      />
+
+      <div className="relative z-10 flex flex-col items-center gap-1">
+        <div className="flex items-center gap-1">
+          {day ? (
+            <Sun className="h-4 w-4 text-amber-500 animate-spin" style={{ animationDuration: '20s' }} />
+          ) : (
+            <Moon className="h-4 w-4 text-indigo-300" />
+          )}
+          <span className={`text-[10px] font-sans font-bold uppercase tracking-wider ${day ? "text-ink-muted" : "text-slate-300"}`}>
+            {isPartner ? "Partner" : "You"}
           </span>
-          <span className={`font-display text-lg ${day ? "text-ink" : "text-paper"}`}>{time}</span>
-          <span className={`font-sans text-xs ${day ? "text-ink/70" : "text-paper/70"}`}>{label}</span>
         </div>
+
+        <div className="flex items-baseline gap-0.5">
+          <span className={`font-display text-2xl font-bold tracking-tight ${day ? "text-ink" : "text-white"}`}>
+            {time}
+          </span>
+          <span className={`text-[10px] font-sans font-semibold uppercase ${day ? "text-ink-muted" : "text-slate-400"}`}>
+            {ampm}
+          </span>
+        </div>
+
+        <span className={`font-sans text-xs font-medium truncate max-w-[100px] ${day ? "text-ink/80" : "text-slate-200"}`}>
+          {label}
+        </span>
       </div>
-      {moodScore != null && (
-        <span
-          className={`absolute bottom-1 right-1 h-3 w-3 rounded-full ring-2 ring-paper ${MOOD_DOT_COLOR[moodScore]}`}
-          aria-hidden="true"
-        />
+
+      {/* Mood Badge Dot for Partner */}
+      {moodScore != null && MOOD_DOT_COLOR[moodScore] && (
+        <div
+          className="absolute top-2.5 right-2.5 flex items-center justify-center"
+          title={`Mood: ${MOOD_DOT_COLOR[moodScore].label}`}
+        >
+          <span className={`h-3 w-3 rounded-full border-2 ${MOOD_DOT_COLOR[moodScore].bg} ${MOOD_DOT_COLOR[moodScore].border} shadow-sm animate-pulse`} />
+        </div>
       )}
     </div>
   );
@@ -93,13 +133,20 @@ export function DualClock({
   myTimezone: string;
   partnerName: string;
   partnerTimezone: string;
-  /** Subtle indicator only — not shown for staleness, just today's mood. */
   partnerMoodScore?: number | null;
 }) {
+  const diffStr = getTimeDifference(myTimezone, partnerTimezone);
+
   return (
-    <div className="flex items-center gap-3">
-      <SkyBadge label={myName} timezone={myTimezone} />
-      <SkyBadge label={partnerName} timezone={partnerTimezone} moodScore={partnerMoodScore} />
+    <div className="flex flex-col items-center sm:items-start gap-2">
+      <div className="flex items-center gap-3">
+        <SkyBadge label={myName} timezone={myTimezone} />
+        <SkyBadge label={partnerName} timezone={partnerTimezone} moodScore={partnerMoodScore} isPartner />
+      </div>
+      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-paper2/80 border border-line text-[11px] font-sans font-medium text-ink-muted">
+        <Clock className="h-3 w-3 text-ember" />
+        <span>{diffStr}</span>
+      </div>
     </div>
   );
 }

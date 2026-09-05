@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { scalePress } from "@/lib/motion";
 import { signup } from "../actions";
+import { KeyRound, User, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -33,72 +34,100 @@ export default function SignupPage() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="inviteCode" className="font-sans text-xs text-ink/70">
-          invite code
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="inviteCode" className="font-sans text-xs font-semibold text-ink-muted uppercase tracking-wider">
+          Invite code
         </label>
-        <input
-          id="inviteCode"
-          name="inviteCode"
-          required
-          autoComplete="off"
-          className="rounded-xl border border-line bg-paper px-4 py-3 font-sans text-sm text-ink outline-none focus:border-ember"
-        />
+        <div className="relative">
+          <input
+            id="inviteCode"
+            name="inviteCode"
+            required
+            autoComplete="off"
+            placeholder="e.g. LOVE-1234"
+            className="w-full rounded-2xl glass-input px-4 py-3 pl-11 font-sans text-sm text-ink placeholder:text-ink-muted/60 outline-none uppercase tracking-wider"
+          />
+          <KeyRound className="absolute left-4 top-3.5 h-4 w-4 text-ink-muted" />
+        </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <label htmlFor="displayName" className="font-sans text-xs text-ink/70">
-          your name
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="displayName" className="font-sans text-xs font-semibold text-ink-muted uppercase tracking-wider">
+          Your name
         </label>
-        <input
-          id="displayName"
-          name="displayName"
-          required
-          autoComplete="name"
-          className="rounded-xl border border-line bg-paper px-4 py-3 font-sans text-sm text-ink outline-none focus:border-ember"
-        />
+        <div className="relative">
+          <input
+            id="displayName"
+            name="displayName"
+            required
+            autoComplete="name"
+            placeholder="e.g. Alex"
+            className="w-full rounded-2xl glass-input px-4 py-3 pl-11 font-sans text-sm text-ink placeholder:text-ink-muted/60 outline-none"
+          />
+          <User className="absolute left-4 top-3.5 h-4 w-4 text-ink-muted" />
+        </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email" className="font-sans text-xs text-ink/70">
-          email
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="email" className="font-sans text-xs font-semibold text-ink-muted uppercase tracking-wider">
+          Email address
         </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          className="rounded-xl border border-line bg-paper px-4 py-3 font-sans text-sm text-ink outline-none focus:border-ember"
-        />
+        <div className="relative">
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            className="w-full rounded-2xl glass-input px-4 py-3 pl-11 font-sans text-sm text-ink placeholder:text-ink-muted/60 outline-none"
+          />
+          <Mail className="absolute left-4 top-3.5 h-4 w-4 text-ink-muted" />
+        </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="font-sans text-xs text-ink/70">
-          password
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="password" className="font-sans text-xs font-semibold text-ink-muted uppercase tracking-wider">
+          Password
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          minLength={8}
-          autoComplete="new-password"
-          className="rounded-xl border border-line bg-paper px-4 py-3 font-sans text-sm text-ink outline-none focus:border-ember"
-        />
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            placeholder="Min. 8 characters"
+            className="w-full rounded-2xl glass-input px-4 py-3 pl-11 font-sans text-sm text-ink placeholder:text-ink-muted/60 outline-none"
+          />
+          <Lock className="absolute left-4 top-3.5 h-4 w-4 text-ink-muted" />
+        </div>
       </div>
-      {error && <p className="font-sans text-sm text-emberDark">{error}</p>}
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-rose-500/10 p-3 text-xs text-rose-700 border border-rose-500/20 font-sans font-medium">
+          <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
+          <span>{error}</span>
+        </div>
+      )}
+
       <motion.button
         variants={scalePress}
         initial="rest"
         whileTap="tap"
         type="submit"
         disabled={isSubmitting}
-        className="rounded-2xl bg-emberDark px-5 py-3 font-sans text-sm text-paper disabled:opacity-60"
+        className="mt-2 flex items-center justify-center gap-2 rounded-2xl gradient-btn px-6 py-3.5 font-sans text-sm font-semibold text-white shadow-lg disabled:opacity-60"
       >
-        {isSubmitting ? "creating account…" : "create account"}
+        <span>{isSubmitting ? "Creating account..." : "Create Account"}</span>
+        <ArrowRight className="h-4 w-4" />
       </motion.button>
-      <p className="text-center font-sans text-xs text-ink/70">
-        already have a space?{" "}
-        <Link href="/login" className="text-ink underline underline-offset-4">
-          sign in
+
+      <p className="mt-2 text-center font-sans text-xs text-ink-muted">
+        Already have a space?{" "}
+        <Link href="/login" className="font-semibold text-ember hover:underline underline-offset-4">
+          Sign in
         </Link>
       </p>
     </form>

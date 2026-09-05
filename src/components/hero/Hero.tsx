@@ -24,15 +24,18 @@ export async function Hero({ context }: { context: CoupleContext }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <DualClock
-          myName={context.myName}
-          myTimezone={context.myTimezone}
-          partnerName={context.partnerName}
-          partnerTimezone={context.partnerTimezone}
-          partnerMoodScore={partnerMood.score}
-        />
-        <div className="sm:mt-3 sm:flex-1">
+      {/* Top Grid: Dual Clocks & Weather */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+        <div className="md:col-span-6 flex justify-center md:justify-start">
+          <DualClock
+            myName={context.myName}
+            myTimezone={context.myTimezone}
+            partnerName={context.partnerName}
+            partnerTimezone={context.partnerTimezone}
+            partnerMoodScore={partnerMood.score}
+          />
+        </div>
+        <div className="md:col-span-6 flex flex-col justify-center">
           <WeatherBridge
             coupleId={context.coupleId}
             partnerName={context.partnerName}
@@ -41,6 +44,7 @@ export async function Hero({ context }: { context: CoupleContext }) {
         </div>
       </div>
 
+      {/* Live Status Pill */}
       <LiveStatusPill
         coupleId={context.coupleId}
         myId={context.myId}
@@ -48,27 +52,23 @@ export async function Hero({ context }: { context: CoupleContext }) {
         initialPartnerStatus={partnerStatus}
       />
 
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <StatCard
-            coupleId={context.coupleId}
-            field="sinceDate"
-            label="together since"
-            initialValue={context.sinceDate}
-            rotation={-1}
-          />
-        </div>
-        <div className="mt-4 flex-1">
-          <StatCard
-            coupleId={context.coupleId}
-            field="nextVisitDate"
-            label="next visit"
-            initialValue={context.nextVisitDate}
-            rotation={1.5}
-          />
-        </div>
+      {/* Stat Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <StatCard
+          coupleId={context.coupleId}
+          field="sinceDate"
+          label="together since"
+          initialValue={context.sinceDate}
+        />
+        <StatCard
+          coupleId={context.coupleId}
+          field="nextVisitDate"
+          label="next visit"
+          initialValue={context.nextVisitDate}
+        />
       </div>
 
+      {/* Milestone Ticker */}
       <MilestoneTicker milestones={milestones} />
     </div>
   );

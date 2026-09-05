@@ -6,15 +6,10 @@ import { scalePress, springSnappy, useReducedMotionSafe } from "@/lib/motion";
 import { useRealtimeEvent } from "@/lib/realtime/RealtimeProvider";
 import { sendPing } from "@/lib/pings/actions";
 import type { HapticPayload, PingEvent } from "@/lib/pings/types";
+import { Play, RotateCcw, Send, Heart, Fingerprint } from "lucide-react";
 
 const SHORT_LONG_THRESHOLD_MS = 300;
 
-/**
- * Schedules a visual on/off pulse matching a Vibration-API-style pattern
- * (alternating vibrate/pause durations), independent of whether the device
- * actually supports navigator.vibrate. Shared by the composer's preview and
- * the receiver's playback so both look identical.
- */
 function playPatternVisually(pattern: number[], setActive: (active: boolean) => void) {
   let elapsed = 0;
   pattern.forEach((duration, index) => {
@@ -30,14 +25,14 @@ function playPatternVisually(pattern: number[], setActive: (active: boolean) => 
 function PulseDot({ active }: { active: boolean }) {
   const { transition } = useReducedMotionSafe();
   return (
-    <motion.span
-      animate={{ scale: active ? 1.25 : 1, opacity: active ? 1 : 0.55 }}
+    <motion.div
+      animate={{ scale: active ? 1.3 : 1, opacity: active ? 1 : 0.6 }}
       transition={transition(springSnappy)}
-      className="flex h-24 w-24 items-center justify-center rounded-full bg-emberDark text-3xl text-paper"
+      className="flex h-20 w-20 items-center justify-center rounded-full gradient-btn text-white shadow-lg shadow-ember/30"
       aria-hidden="true"
     >
-      ♥
-    </motion.span>
+      <Heart className={`h-9 w-9 fill-white/40 ${active ? "animate-pulse" : ""}`} />
+    </motion.div>
   );
 }
 
@@ -51,10 +46,6 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
   const pressStartRef = useRef<number | null>(null);
   const lastReleaseRef = useRef<number | null>(null);
 
-  // The pad below measures real hold duration — there's no keyboard
-  // equivalent to "how long was this key held," so these two buttons are a
-  // genuine (not cosmetic) alternative: same alternating pulse/gap shape,
-  // fixed durations instead of measured ones.
   function addFixedPulse(duration: number) {
     setPattern((prev) => (prev.length === 0 ? [duration] : [...prev, 150, duration]));
   }
@@ -97,7 +88,7 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
     if (pattern.length === 0) return;
     setError(null);
     setIsSending(true);
-    const payload: HapticPayload = { name: name.trim() || "a pattern", pattern };
+    const payload: HapticPayload = { name: name.trim() || "a secret code", pattern };
     const result = await sendPing(coupleId, "haptic", payload);
     setIsSending(false);
     if (!result.ok) {
@@ -108,23 +99,30 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4">
-      <h2 className="font-display text-2xl">tap out a pattern</h2>
-      <p className="text-center font-sans text-sm text-ink/70">
-        tap for a short pulse, hold for a long one. three short taps means
-        &ldquo;I miss you.&rdquo;
-      </p>
+    <div className="flex flex-col items-center gap-5 rounded-3xl glass-card p-6 border border-white/80 shadow-glass">
+      <div className="flex flex-col gap-1 text-center">
+        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-ember">
+          Haptic Touch Pattern
+        </span>
+        <h3 className="font-display text-xl font-bold text-ink">Tap Out a Secret Pulse</h3>
+        <p className="font-sans text-xs text-ink-muted">
+          Tap for short pulses, hold for long ones to compose a custom vibration pattern.
+        </p>
+      </div>
 
+      {/* Interactive Touch Pad */}
       <div
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        className="flex h-32 w-32 select-none items-center justify-center rounded-full border border-dashed border-line bg-paper2 font-sans text-xs text-ink/70 active:bg-paper"
+        className="flex h-36 w-36 select-none flex-col items-center justify-center gap-1 rounded-full border-2 border-dashed border-ember/40 bg-gradient-to-br from-paper2 to-white font-sans text-xs font-semibold text-ember active:scale-95 transition-all shadow-inner cursor-pointer"
         aria-hidden="true"
       >
-        press &amp; hold
+        <Fingerprint className="h-6 w-6 text-ember animate-pulse" />
+        <span>Press &amp; Hold</span>
       </div>
 
+      {/* Preset Quick Pulse Buttons */}
       <div className="flex gap-2">
         <motion.button
           variants={scalePress}
@@ -132,9 +130,9 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
           whileTap="tap"
           type="button"
           onClick={() => addFixedPulse(150)}
-          className="rounded-full border border-line px-3 py-1.5 font-sans text-xs text-ink"
+          className="rounded-xl border border-line bg-white/70 px-3 py-1.5 font-sans text-xs font-medium text-ink hover:bg-paper2 transition-colors shadow-sm"
         >
-          add short pulse
+          + Short Pulse
         </motion.button>
         <motion.button
           variants={scalePress}
@@ -142,29 +140,35 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
           whileTap="tap"
           type="button"
           onClick={() => addFixedPulse(500)}
-          className="rounded-full border border-line px-3 py-1.5 font-sans text-xs text-ink"
+          className="rounded-xl border border-line bg-white/70 px-3 py-1.5 font-sans text-xs font-medium text-ink hover:bg-paper2 transition-colors shadow-sm"
         >
-          add long pulse
+          + Long Pulse
         </motion.button>
       </div>
 
-      <div className="flex min-h-6 flex-wrap items-center justify-center gap-1">
-        {pattern.map((duration, index) =>
-          index % 2 === 0 ? (
-            <span
-              key={index}
-              className="rounded-full bg-ember/70"
-              style={{
-                width: duration >= SHORT_LONG_THRESHOLD_MS ? 28 : 12,
-                height: 8,
-              }}
-              aria-hidden="true"
-            />
-          ) : null,
+      {/* Pattern Visualizer Bars */}
+      <div className="flex min-h-[24px] items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-paper2/70 border border-line w-full max-w-xs overflow-x-auto">
+        {pattern.length === 0 ? (
+          <span className="text-[11px] font-sans text-ink-muted italic">Pattern waveform will appear here...</span>
+        ) : (
+          pattern.map((duration, index) =>
+            index % 2 === 0 ? (
+              <span
+                key={index}
+                className="rounded-full bg-gradient-to-r from-ember to-amber shadow-sm"
+                style={{
+                  width: duration >= SHORT_LONG_THRESHOLD_MS ? 28 : 12,
+                  height: 10,
+                }}
+                aria-hidden="true"
+              />
+            ) : null,
+          )
         )}
       </div>
 
-      <div className="flex gap-2">
+      {/* Control Buttons */}
+      <div className="flex items-center gap-2">
         <motion.button
           variants={scalePress}
           initial="rest"
@@ -172,9 +176,10 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
           type="button"
           onClick={handlePreview}
           disabled={pattern.length === 0 || isPlaying}
-          className="rounded-full border border-line px-4 py-2 font-sans text-xs text-ink disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-xl border border-line bg-white px-3.5 py-1.5 font-sans text-xs font-semibold text-ink disabled:opacity-50 shadow-sm"
         >
-          preview
+          <Play className="h-3.5 w-3.5 text-amber" />
+          <span>Preview</span>
         </motion.button>
         <motion.button
           variants={scalePress}
@@ -183,9 +188,10 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
           type="button"
           onClick={handleClear}
           disabled={pattern.length === 0}
-          className="rounded-full border border-line px-4 py-2 font-sans text-xs text-ink disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-xl border border-line bg-white px-3.5 py-1.5 font-sans text-xs font-semibold text-ink disabled:opacity-50 shadow-sm"
         >
-          clear
+          <RotateCcw className="h-3.5 w-3.5 text-ink-muted" />
+          <span>Clear</span>
         </motion.button>
       </div>
 
@@ -194,13 +200,13 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
       <input
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="name it — “I miss you”"
+        placeholder="Give your pulse a name (e.g., 'Thinking of you')"
         aria-label="pattern name"
-        className="w-full rounded-xl border border-line bg-paper px-4 py-3 text-center font-sans text-sm text-ink outline-none focus:border-ember"
+        className="w-full max-w-xs rounded-2xl glass-input px-4 py-2.5 text-center font-sans text-xs text-ink placeholder:text-ink-muted outline-none"
       />
 
-      {error && <p className="font-sans text-sm text-emberDark">{error}</p>}
-      {sent && <p className="font-sans text-sm text-ink">sent.</p>}
+      {error && <p className="font-sans text-xs text-rose-600 font-medium">{error}</p>}
+      {sent && <p className="font-sans text-xs text-emerald-700 font-medium">Haptic signal sent successfully!</p>}
 
       <motion.button
         variants={scalePress}
@@ -209,18 +215,15 @@ export function HapticComposer({ coupleId }: { coupleId: string }) {
         type="button"
         onClick={handleSend}
         disabled={pattern.length === 0 || isSending}
-        className="w-full rounded-2xl bg-emberDark px-5 py-3 font-sans text-sm text-paper disabled:opacity-60"
+        className="w-full max-w-xs rounded-2xl gradient-btn px-5 py-3 font-sans text-xs font-semibold text-white shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
       >
-        {isSending ? "sending…" : "send pattern"}
+        <Send className="h-4 w-4" />
+        <span>{isSending ? "Sending Pulse..." : "Send Touch Signal"}</span>
       </motion.button>
     </div>
   );
 }
 
-/**
- * Mounted once at the app shell level (not just on this feature's page) so
- * an incoming pattern replays wherever the partner happens to be in the app.
- */
 export function HapticReceiver({ myId, partnerName }: { myId: string; partnerName: string }) {
   const [incoming, setIncoming] = useState<HapticPayload | null>(null);
   const [active, setActive] = useState(false);
@@ -248,9 +251,9 @@ export function HapticReceiver({ myId, partnerName }: { myId: string; partnerNam
   if (!incoming) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2">
+    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-50 flex flex-col items-center gap-2">
       <PulseDot active={active} />
-      <p className="rounded-full bg-ink/90 px-4 py-2 font-sans text-xs text-paper">
+      <p className="rounded-full bg-slate-900/90 backdrop-blur-md border border-white/20 px-5 py-2 font-sans text-xs font-semibold text-white shadow-2xl">
         {partnerName} sent &ldquo;{incoming.name}&rdquo;
       </p>
     </div>

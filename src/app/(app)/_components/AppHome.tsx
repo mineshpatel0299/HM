@@ -1,15 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { fadeRise, useReducedMotionSafe } from "@/lib/motion";
-import { SectionDivider } from "@/components/ui/SectionDivider";
 import { PushNotifications } from "@/components/push/PushNotifications";
+import { HeartHandshake } from "lucide-react";
 
-// Hero is an async Server Component (it fetches status/weather itself), so
-// it can't be imported here directly — this file needs "use client" for
-// framer-motion. The page renders <Hero /> and passes it in as children.
 export function AppHome({ children }: { children: ReactNode }) {
   const { variants } = useReducedMotionSafe();
 
@@ -18,51 +14,27 @@ export function AppHome({ children }: { children: ReactNode }) {
       variants={variants(fadeRise)}
       initial="hidden"
       animate="visible"
-      className="mx-auto flex w-full max-w-xl flex-col gap-8"
+      className="flex w-full max-w-2xl mx-auto flex-col gap-6"
     >
-      <header className="flex flex-col gap-1">
-        <p className="font-sans text-sm text-ink/70">you&apos;re both here now</p>
-        <h1 className="font-display text-3xl">two skies, one thread</h1>
+      <header className="flex items-center justify-between gap-4 p-5 rounded-3xl glass-card border border-white/80 shadow-glass">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className="font-sans text-xs font-semibold tracking-wider text-ember uppercase">Private Thread</span>
+            <span className="h-1 w-1 rounded-full bg-ember" />
+            <span className="font-sans text-xs text-ink-muted">Live Sync</span>
+          </div>
+          <h1 className="font-display text-2xl sm:text-3xl text-ink font-semibold tracking-tight">
+            Two skies, one heart
+          </h1>
+        </div>
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ember/10 border border-ember/20 text-ember">
+          <HeartHandshake className="h-6 w-6" />
+        </div>
       </header>
 
       <PushNotifications />
 
-      <SectionDivider />
-
       {children}
-
-      <div className="flex flex-wrap gap-4">
-        <Link
-          href="/connect"
-          className="self-start font-sans text-sm text-ink underline underline-offset-4"
-        >
-          connection signals
-        </Link>
-        <Link
-          href="/play"
-          className="self-start font-sans text-sm text-ink underline underline-offset-4"
-        >
-          spark &amp; games
-        </Link>
-        <Link
-          href="/rhythm"
-          className="self-start font-sans text-sm text-ink underline underline-offset-4"
-        >
-          daily rhythm
-        </Link>
-        <Link
-          href="/memories"
-          className="self-start font-sans text-sm text-ink underline underline-offset-4"
-        >
-          memories
-        </Link>
-        <Link
-          href="/notes"
-          className="self-start font-sans text-sm text-ink underline underline-offset-4"
-        >
-          notes
-        </Link>
-      </div>
     </motion.div>
   );
 }
