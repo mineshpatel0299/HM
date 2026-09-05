@@ -7,7 +7,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const context = await getCoupleContext();
 
   return (
-    <div className="relative min-h-screen text-ink pb-24 md:pb-12">
+    <div className="relative min-h-screen text-ink pb-32 md:pb-12">
       <Navbar partnerName={context?.partnerName} />
 
       <main className="px-4 sm:px-8 max-w-4xl mx-auto">

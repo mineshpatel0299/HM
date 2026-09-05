@@ -99,8 +99,8 @@ export function Navbar({ partnerName }: NavbarProps) {
       </header>
 
       {/* Mobile Floating Bottom Dock */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden w-[92%] max-w-sm">
-        <nav className="flex items-center justify-around rounded-2xl glass-card p-2 border border-white/60 shadow-floating">
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 md:hidden w-[94%] max-w-md">
+        <nav className="flex items-center justify-around rounded-3xl bg-white/80 backdrop-blur-2xl p-2 border border-white/90 shadow-2xl shadow-ember/15">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -108,19 +108,21 @@ export function Navbar({ partnerName }: NavbarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex flex-col items-center gap-1 p-2 rounded-xl text-center transition-colors ${
-                  isActive ? "text-ember font-semibold" : "text-ink-muted hover:text-ink"
+                className={`relative flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-2xl text-center transition-all duration-200 ${
+                  isActive ? "text-ember font-bold scale-105" : "text-ink-muted/80 hover:text-ink"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="mobileActiveDock"
-                    className="absolute inset-0 rounded-xl bg-ember/10 border border-ember/30"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-ember/15 to-amber/15 border border-ember/25 shadow-sm"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
-                <Icon className={`h-5 w-5 ${isActive ? "text-ember" : "text-ink-muted"}`} />
-                <span className="text-[10px] font-sans font-medium leading-none">{item.label}</span>
+                <Icon className={`relative z-10 h-5 w-5 ${isActive ? "text-ember" : "text-ink-muted"}`} />
+                <span className="relative z-10 text-[10px] font-sans font-semibold tracking-tight leading-none">
+                  {item.label}
+                </span>
               </Link>
             );
           })}
