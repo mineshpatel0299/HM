@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { differenceInCalendarDays, parseISO, format } from "date-fns";
 import { reveal, scalePress, useReducedMotionSafe } from "@/lib/motion";
@@ -10,18 +11,25 @@ import { Heart, Plane, Edit3, Check, X, Calendar as CalendarIcon } from "lucide-
 
 function computeDisplay(field: CoupleDateField, value: string | null): { big: string; small: string; formattedDate: string } {
   if (!value) return { big: "—", small: "Not set yet", formattedDate: "Tap to set date" };
-  const target = parseISO(value);
-  const today = new Date();
-  const formattedDate = format(target, "MMM d, yyyy");
+  try {
+    const target = parseISO(value);
+    if (isNaN(target.getTime())) {
+      return { big: "—", small: "Not set yet", formattedDate: "Tap to set date" };
+    }
+    const today = new Date();
+    const formattedDate = format(target, "MMM d, yyyy");
 
-  if (field === "sinceDate") {
-    const days = Math.max(differenceInCalendarDays(today, target) + 1, 1);
-    return { big: String(days), small: "Days of love", formattedDate };
+    if (field === "sinceDate") {
+      const days = Math.max(differenceInCalendarDays(today, target) + 1, 1);
+      return { big: String(days), small: "Days of love", formattedDate };
+    }
+    const days = differenceInCalendarDays(target, today);
+    if (days < 0) return { big: "—", small: "Date passed", formattedDate };
+    if (days === 0) return { big: "Today!", small: "Reunion is here 🎉", formattedDate };
+    return { big: String(days), small: "Days to reunion", formattedDate };
+  } catch {
+    return { big: "—", small: "Not set yet", formattedDate: "Tap to set date" };
   }
-  const days = differenceInCalendarDays(target, today);
-  if (days < 0) return { big: "—", small: "Date passed", formattedDate };
-  if (days === 0) return { big: "Today!", small: "Reunion is here 🎉", formattedDate };
-  return { big: String(days), small: "Days to reunion", formattedDate };
 }
 
 export function StatCard({
@@ -36,6 +44,7 @@ export function StatCard({
   initialValue: string | null;
   rotation?: number;
 }) {
+  const router = useRouter();
   const [value, setValue] = useState(initialValue);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(initialValue ?? "");
@@ -65,6 +74,7 @@ export function StatCard({
     if (result.ok) {
       setValue(draft || null);
       setIsEditing(false);
+      router.refresh();
     }
   }
 
