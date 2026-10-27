@@ -181,7 +181,7 @@ export function PeriodTracker({
             </span>
             <Flower2 size={19} strokeWidth={1.3} className="text-ember" />
           </div>
-          <div className="relative my-7 flex h-[220px] w-[220px] items-center justify-center">
+          <div className="relative my-7 aspect-square w-[220px] max-w-full shrink-0">
             <svg
               viewBox="0 0 220 220"
               aria-hidden="true"
@@ -206,19 +206,19 @@ export function PeriodTracker({
                 strokeDasharray={`${(summary?.progress ?? 0.03) * 615.75} 615.75`}
               />
             </svg>
-            <div className="flex flex-col items-center">
+            <div className="absolute inset-[18%] flex min-w-0 flex-col items-center justify-center gap-1 text-center">
               <Droplets
-                size={20}
+                size={18}
                 strokeWidth={1.5}
-                className="mb-3 text-ember"
+                className="shrink-0 text-ember"
               />
-              <span className="text-[10px] uppercase tracking-[.15em] text-emberDark">
+              <span className="max-w-full text-[9px] uppercase leading-4 tracking-[.12em] text-emberDark">
                 {summary ? "Cycle day" : "Your next chapter"}
               </span>
-              <span className="my-1 font-display text-[62px] leading-tight tracking-tight text-emberDark">
+              <span className="max-w-full font-display text-[52px] leading-none tracking-tight text-emberDark tabular-nums">
                 {summary?.day ?? "—"}
               </span>
-              <span className="text-xs text-emberDark/80">
+              <span className="max-w-[132px] text-balance text-[11px] leading-4 text-emberDark/80">
                 {summary
                   ? summary.onPeriod
                     ? "Period logged"
@@ -493,12 +493,12 @@ export function PeriodTracker({
         onClose={() => {
           if (!pending) setEditor(null);
         }}
-        className="w-[calc(100%_-_2rem)] max-w-md rounded-3xl border border-line bg-white p-6 text-ink shadow-2xl sm:p-8"
+        className="max-h-[calc(100dvh_-_2rem)] w-[calc(100%_-_2rem)] max-w-md overflow-y-auto overscroll-contain rounded-3xl border border-line bg-white p-5 text-ink shadow-2xl sm:p-8"
       >
         {editor && (
-          <form onSubmit={submit} className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <div>
+          <form onSubmit={submit} className="flex min-w-0 flex-col gap-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <p className="eyebrow mb-2 text-ember">Just for you</p>
                 <h2 id="cycle-dialog-title" className="font-display text-2xl">
                   {editor.kind === "settings"
@@ -514,7 +514,7 @@ export function PeriodTracker({
                 type="button"
                 aria-label="Close dialog"
                 disabled={pending}
-                className="rounded-full p-2 text-ink-muted hover:bg-paper"
+                className="shrink-0 rounded-full p-2 text-ink-muted hover:bg-paper"
                 onClick={() => setEditor(null)}
               >
                 <X size={18} />
@@ -526,10 +526,10 @@ export function PeriodTracker({
                   Use your usual lengths to personalize estimates. You can
                   update these whenever your rhythm changes.
                 </p>
-                <label className="flex flex-col gap-2 text-xs font-medium">
+                <label className="grid min-w-0 gap-2 text-xs font-medium">
                   Cycle length (days)
                   <input
-                    className="field"
+                    className="field min-w-0 max-w-full"
                     name="cycleLength"
                     type="number"
                     min="15"
@@ -538,10 +538,10 @@ export function PeriodTracker({
                     defaultValue={settings.cycleLength}
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-medium">
+                <label className="grid min-w-0 gap-2 text-xs font-medium">
                   Period length (days)
                   <input
-                    className="field"
+                    className="field min-w-0 max-w-full"
                     name="periodLength"
                     type="number"
                     min="1"
@@ -559,11 +559,11 @@ export function PeriodTracker({
               </p>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="flex flex-col gap-2 text-xs font-medium">
+                <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="grid min-w-0 gap-2 text-xs font-medium">
                     Start date
                     <input
-                      className="field !px-2.5"
+                      className="field min-w-0 max-w-full !px-2.5"
                       name="startDate"
                       type="date"
                       max={today}
@@ -571,10 +571,15 @@ export function PeriodTracker({
                       defaultValue={editor.entry?.startDate ?? today}
                     />
                   </label>
-                  <label className="flex flex-col gap-2 text-xs font-medium">
-                    End date <span className="sr-only">optional</span>
+                  <label className="grid min-w-0 gap-2 text-xs font-medium">
+                    <span>
+                      End date{" "}
+                      <span className="font-normal text-ink-muted">
+                        (optional)
+                      </span>
+                    </span>
                     <input
-                      className="field !px-2.5"
+                      className="field min-w-0 max-w-full !px-2.5"
                       name="endDate"
                       type="date"
                       max={today}
@@ -582,10 +587,10 @@ export function PeriodTracker({
                     />
                   </label>
                 </div>
-                <p className="-mt-2 text-[10px] text-ink-muted">
+                <p className="-mt-2 text-[10px] leading-relaxed text-ink-muted">
                   Leave the end date blank if your period is ongoing.
                 </p>
-                <fieldset>
+                <fieldset className="min-w-0">
                   <legend className="mb-3 text-xs font-medium">
                     How are you feeling?
                   </legend>
@@ -609,7 +614,7 @@ export function PeriodTracker({
                     ))}
                   </div>
                 </fieldset>
-                <label className="flex flex-col gap-2 text-xs font-medium">
+                <label className="grid min-w-0 gap-2 text-xs font-medium">
                   A note to yourself{" "}
                   <textarea
                     name="note"
@@ -617,7 +622,7 @@ export function PeriodTracker({
                     rows={3}
                     defaultValue={editor.entry?.note ?? ""}
                     placeholder="Anything you’d like to remember…"
-                    className="field resize-y"
+                    className="field min-w-0 max-w-full resize-y"
                   />
                 </label>
               </>
@@ -630,7 +635,7 @@ export function PeriodTracker({
                 {error}
               </p>
             )}
-            <div className="flex justify-end gap-3 border-t border-line pt-5">
+            <div className="flex flex-wrap justify-end gap-3 border-t border-line pt-5">
               <button
                 type="button"
                 className="secondary-button"
