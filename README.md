@@ -1,4 +1,4 @@
-# Us, Anyway
+# Humin
 
 A private, two-person webapp for a long-distance couple — presence, daily
 rhythm, games, memories, and notes shared across two timezones. Not a public

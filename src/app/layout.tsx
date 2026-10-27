@@ -17,7 +17,7 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Us, Anyway",
+  title: "Humin",
   description: "A private thread between two people, two skies apart.",
 };
 

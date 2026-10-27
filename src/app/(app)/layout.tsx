@@ -32,7 +32,7 @@ export default async function AppLayout({
         </div>
         <footer className="mx-auto mt-12 flex max-w-[1120px] items-center justify-between border-t border-line pt-5 text-[10px] text-ink-muted">
           <span>Made for your kind of love.</span>
-          <span>Us, Anyway &copy; {new Date().getFullYear()}</span>
+          <span>Humin &copy; {new Date().getFullYear()}</span>
         </footer>
       </main>
     </div>

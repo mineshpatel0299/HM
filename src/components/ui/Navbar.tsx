@@ -41,7 +41,7 @@ export function Navbar({
           </span>
           <div>
             <span className="font-display text-xl tracking-tight">
-              Us, Anyway<span className="text-ember">.</span>
+              Humin<span className="text-ember">.</span>
             </span>
             <p className="mt-0.5 text-[9px] uppercase tracking-[.22em] text-ink-muted">
               A little closer, always
@@ -101,7 +101,7 @@ export function Navbar({
         <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between gap-3 px-5 sm:px-9 lg:px-12">
           <Link href="/" className="flex items-center gap-2 lg:hidden">
             <Heart size={19} className="text-ember" />
-            <span className="font-display text-xl">Us, Anyway.</span>
+            <span className="font-display text-xl">Humin.</span>
           </Link>
           <span className="hidden items-center gap-2 text-[11px] text-ink-muted lg:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-sage" />

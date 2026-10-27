@@ -14,7 +14,7 @@ export default function AuthLayout({
           className="relative z-10 flex items-center gap-3 font-display text-2xl"
         >
           <Heart size={24} strokeWidth={1.3} />
-          Us, Anyway.
+          Humin.
         </Link>
         <div className="relative z-10 max-w-lg py-16">
           <p className="mb-7 text-[10px] uppercase tracking-[.25em] text-[#e7bac6]">
@@ -50,7 +50,7 @@ export default function AuthLayout({
             <span className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-ember/10 text-ember">
               <Heart size={22} strokeWidth={1.4} />
             </span>
-            <p className="eyebrow mb-3 text-ember">Welcome to Us, Anyway</p>
+            <p className="eyebrow mb-3 text-ember">Welcome to Humin</p>
             <h2 className="font-display text-3xl font-medium sm:text-4xl">
               Come a little closer.
             </h2>
