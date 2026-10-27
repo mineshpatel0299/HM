@@ -1,3 +1,4 @@
+import { formatInTimeZone } from "date-fns-tz";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getCoupleContext } from "@/lib/db/getCoupleContext";
@@ -14,7 +15,14 @@ export default async function AppPage() {
   if (!context) return <Pairing />;
 
   return (
-    <AppHome>
+    <AppHome
+      myName={context.myName}
+      dateLabel={formatInTimeZone(
+        new Date(),
+        context.myTimezone,
+        "EEEE, MMMM d",
+      )}
+    >
       {context.partnerName ? (
         <Hero context={context} />
       ) : (

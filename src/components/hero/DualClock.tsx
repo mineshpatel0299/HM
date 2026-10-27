@@ -11,7 +11,10 @@ function isDaytime(date: Date, timeZone: string): boolean {
   return hour >= 6 && hour < 18;
 }
 
-const MOOD_DOT_COLOR: Record<number, { bg: string; border: string; label: string }> = {
+const MOOD_DOT_COLOR: Record<
+  number,
+  { bg: string; border: string; label: string }
+> = {
   1: { bg: "bg-rose-600", border: "border-rose-400", label: "Rough day" },
   2: { bg: "bg-amber-500", border: "border-amber-300", label: "Tired" },
   3: { bg: "bg-blue-400", border: "border-blue-300", label: "Okay" },
@@ -54,7 +57,7 @@ function SkyBadge({
 
   if (!now) {
     return (
-      <div className="flex flex-col items-center justify-center h-32 w-32 rounded-3xl bg-paper2/50 animate-pulse border border-line" />
+      <div className="flex flex-col items-center justify-center h-36 w-full min-w-0 rounded-3xl bg-paper2/50 animate-pulse border border-line" />
     );
   }
 
@@ -63,7 +66,7 @@ function SkyBadge({
   const ampm = formatInTimeZone(now, timezone, "a");
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-32 w-32 rounded-3xl p-3 text-center transition-transform hover:scale-[1.02] shadow-glass border border-white/80 overflow-hidden group">
+    <div className="relative flex flex-col items-center justify-center h-36 w-full min-w-0 rounded-3xl p-3 text-center transition-transform hover:scale-[1.02] border border-line overflow-hidden group">
       {/* Dynamic Background Gradients */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-b from-amber/20 via-orange-100/40 to-paper"
@@ -86,25 +89,33 @@ function SkyBadge({
       <div className="relative z-10 flex flex-col items-center gap-1">
         <div className="flex items-center gap-1">
           {day ? (
-            <Sun className="h-4 w-4 text-amber-500 animate-spin" style={{ animationDuration: '20s' }} />
+            <Sun className="h-4 w-4 text-amber-500" />
           ) : (
             <Moon className="h-4 w-4 text-indigo-300" />
           )}
-          <span className={`text-[10px] font-sans font-bold uppercase tracking-wider ${day ? "text-ink-muted" : "text-slate-300"}`}>
+          <span
+            className={`text-[10px] font-sans font-bold uppercase tracking-wider ${day ? "text-ink-muted" : "text-slate-300"}`}
+          >
             {isPartner ? "Partner" : "You"}
           </span>
         </div>
 
         <div className="flex items-baseline gap-0.5">
-          <span className={`font-display text-2xl font-bold tracking-tight ${day ? "text-ink" : "text-white"}`}>
+          <span
+            className={`font-display text-2xl font-bold tracking-tight ${day ? "text-ink" : "text-white"}`}
+          >
             {time}
           </span>
-          <span className={`text-[10px] font-sans font-semibold uppercase ${day ? "text-ink-muted" : "text-slate-400"}`}>
+          <span
+            className={`text-[10px] font-sans font-semibold uppercase ${day ? "text-ink-muted" : "text-slate-400"}`}
+          >
             {ampm}
           </span>
         </div>
 
-        <span className={`font-sans text-xs font-medium truncate max-w-[100px] ${day ? "text-ink/80" : "text-slate-200"}`}>
+        <span
+          className={`font-sans text-xs font-medium truncate max-w-[100px] ${day ? "text-ink/80" : "text-slate-200"}`}
+        >
           {label}
         </span>
       </div>
@@ -115,7 +126,9 @@ function SkyBadge({
           className="absolute top-2.5 right-2.5 flex items-center justify-center"
           title={`Mood: ${MOOD_DOT_COLOR[moodScore].label}`}
         >
-          <span className={`h-3 w-3 rounded-full border-2 ${MOOD_DOT_COLOR[moodScore].bg} ${MOOD_DOT_COLOR[moodScore].border} shadow-sm animate-pulse`} />
+          <span
+            className={`h-3 w-3 rounded-full border-2 ${MOOD_DOT_COLOR[moodScore].bg} ${MOOD_DOT_COLOR[moodScore].border} shadow-sm animate-pulse`}
+          />
         </div>
       )}
     </div>
@@ -138,12 +151,17 @@ export function DualClock({
   const diffStr = getTimeDifference(myTimezone, partnerTimezone);
 
   return (
-    <div className="flex flex-col items-center sm:items-start gap-2">
-      <div className="flex items-center gap-3">
+    <div className="flex w-full flex-col gap-4">
+      <div className="grid w-full grid-cols-2 gap-3">
         <SkyBadge label={myName} timezone={myTimezone} />
-        <SkyBadge label={partnerName} timezone={partnerTimezone} moodScore={partnerMoodScore} isPartner />
+        <SkyBadge
+          label={partnerName}
+          timezone={partnerTimezone}
+          moodScore={partnerMoodScore}
+          isPartner
+        />
       </div>
-      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-paper2/80 border border-line text-[11px] font-sans font-medium text-ink-muted">
+      <div className="flex items-center justify-center gap-1.5 text-[10px] text-ink-muted">
         <Clock className="h-3 w-3 text-ember" />
         <span>{diffStr}</span>
       </div>

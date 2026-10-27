@@ -92,3 +92,22 @@ your invite code from the home page afterward. These are two different
 codes: `SIGNUP_INVITE_CODE` gates account creation; the couple pairing
 code (shown on the home page once signed in) links two existing accounts
 together.
+
+## Period tracker
+
+The private `/cycle` page supports period start/end dates, symptoms, notes, editable
+cycle preferences, history, and a calendar that distinguishes logged and estimated
+dates. Entries are scoped to the authenticated profile; partners cannot read them.
+Estimates use the latest period and the cycle length the user chooses. They do not
+roll forward when a period is overdue.
+
+Apply migration `0008_period_tracker` with `npm run db:migrate` before using the
+tracker. Test migrations on a Neon development branch first. Until the tables are
+available, the tracker displays a setup message and disables saving.
+
+Date calculation checks can be run without connecting to the database:
+
+```bash
+npx tsc src/lib/cycle/dates.test.ts src/lib/cycle/dates.ts src/lib/cycle/types.ts --outDir /tmp/hm-cycle-tests --module commonjs --target es2020 --esModuleInterop --skipLibCheck
+NODE_PATH="$PWD/node_modules" TZ=America/New_York node --test /tmp/hm-cycle-tests/dates.test.js
+```

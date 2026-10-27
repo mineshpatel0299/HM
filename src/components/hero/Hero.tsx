@@ -11,7 +11,8 @@ import { WeatherBridge } from "./WeatherBridge";
 import { MilestoneTicker } from "./MilestoneTicker";
 
 export async function Hero({ context }: { context: CoupleContext }) {
-  if (!context.partnerId || !context.partnerName || !context.partnerTimezone) return null;
+  if (!context.partnerId || !context.partnerName || !context.partnerTimezone)
+    return null;
 
   await checkDaysTogetherMilestones(context.coupleId, context.sinceDate);
 
@@ -25,8 +26,8 @@ export async function Hero({ context }: { context: CoupleContext }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Grid: Dual Clocks & Weather */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
-        <div className="md:col-span-6 flex justify-center md:justify-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+        <div className="premium-card p-5 sm:p-6 xl:col-span-7">
           <DualClock
             myName={context.myName}
             myTimezone={context.myTimezone}
@@ -35,7 +36,7 @@ export async function Hero({ context }: { context: CoupleContext }) {
             partnerMoodScore={partnerMood.score}
           />
         </div>
-        <div className="md:col-span-6 flex flex-col justify-center">
+        <div className="premium-card p-5 sm:p-6 xl:col-span-5 flex flex-col justify-center">
           <WeatherBridge
             coupleId={context.coupleId}
             partnerName={context.partnerName}

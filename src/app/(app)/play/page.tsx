@@ -1,3 +1,4 @@
+import { PageHeading } from "@/components/ui/PageHeading";
 import { formatInTimeZone } from "date-fns-tz";
 import { redirect } from "next/navigation";
 import { getCoupleContext } from "@/lib/db/getCoupleContext";
@@ -29,31 +30,28 @@ export default async function PlayPage() {
   const todayKey = formatInTimeZone(today, "UTC", "yyyy-MM-dd");
   const prompt = getPromptForDate(today);
 
-  const [sparkState, diaryState, ladderProgress, guessDayState] = await Promise.all([
-    getSparkState(context.coupleId, context.myId, prompt.id),
-    getDiaryState(context.coupleId, context.myId, todayKey),
-    getLadderProgress(context.coupleId),
-    getGuessDayState(context.coupleId, todayKey, context.myId, context.partnerId),
-  ]);
+  const [sparkState, diaryState, ladderProgress, guessDayState] =
+    await Promise.all([
+      getSparkState(context.coupleId, context.myId, prompt.id),
+      getDiaryState(context.coupleId, context.myId, todayKey),
+      getLadderProgress(context.coupleId),
+      getGuessDayState(
+        context.coupleId,
+        todayKey,
+        context.myId,
+        context.partnerId,
+      ),
+    ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
       {/* Header Banner */}
-      <header className="flex items-center justify-between gap-4 p-5 rounded-3xl glass-card border border-white/80 shadow-glass">
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
-            <span className="font-sans text-xs font-semibold tracking-wider text-amber uppercase">Spark &amp; Games</span>
-            <span className="h-1 w-1 rounded-full bg-amber" />
-            <span className="font-sans text-xs text-ink-muted">Daily Reset</span>
-          </div>
-          <h1 className="font-display text-2xl sm:text-3xl text-ink font-semibold tracking-tight">
-            Play &amp; Discover
-          </h1>
-        </div>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber/10 border border-amber/20 text-amber">
-          <Gamepad2 className="h-6 w-6" />
-        </div>
-      </header>
+      <PageHeading
+        eyebrow="Stay curious about each other"
+        title="A little spark. A little play."
+        description="Make time for a question, a shared laugh, or something you never knew about them."
+        icon={Gamepad2}
+      />
 
       {/* Main Game Modules */}
       <div className="flex flex-col gap-6">

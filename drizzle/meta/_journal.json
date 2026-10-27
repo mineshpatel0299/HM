@@ -57,6 +57,13 @@
       "when": 1788540087586,
       "tag": "0007_milky_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793082402449,
+      "tag": "0008_period_tracker",
+      "breakpoints": true
     }
   ]
 }

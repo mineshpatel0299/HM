@@ -215,3 +215,19 @@ export const scheduledNotes = pgTable("scheduled_notes", {
   sent: boolean("sent").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Health entries belong to an individual profile and are never queried by couple ID.
+export const cycleSettings = pgTable("cycle_settings", {
+  profileId: uuid("profile_id").primaryKey().references(() => profiles.id, { onDelete: "cascade" }),
+  cycleLength: integer("cycle_length").notNull().default(28),
+  periodLength: integer("period_length").notNull().default(5),
+});
+
+export const periodEntries = pgTable("period_entries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  profileId: uuid("profile_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  symptoms: jsonb("symptoms").$type<import("../cycle/types").Symptom[]>().notNull().default([]),
+  note: text("note").notNull().default(""),
+}, (table) => [unique().on(table.profileId, table.startDate)]);

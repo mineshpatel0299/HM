@@ -2,132 +2,138 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Radio, 
-  Gamepad2, 
-  Moon, 
-  Camera, 
-  Feather
+import {
+  Heart,
+  Radio,
+  Gamepad2,
+  Moon,
+  Camera,
+  Feather,
+  Flower2,
+  ArrowUpRight,
+  LockKeyhole,
 } from "lucide-react";
 
-interface NavbarProps {
-  partnerName?: string | null;
-}
-
 const navItems = [
-  { href: "/", label: "Thread", icon: Heart },
+  { href: "/", label: "Our space", icon: Heart },
   { href: "/connect", label: "Signals", icon: Radio },
-  { href: "/play", label: "Games", icon: Gamepad2 },
-  { href: "/rhythm", label: "Rhythm", icon: Moon },
+  { href: "/play", label: "Play & discover", icon: Gamepad2 },
+  { href: "/rhythm", label: "Daily rhythm", icon: Moon },
+  { href: "/cycle", label: "Period tracker", icon: Flower2 },
   { href: "/memories", label: "Memories", icon: Camera },
-  { href: "/notes", label: "Notes", icon: Feather },
+  { href: "/notes", label: "Love notes", icon: Feather },
 ];
 
-export function Navbar({ partnerName }: NavbarProps) {
+export function Navbar({
+  partnerName,
+  myName,
+}: {
+  partnerName?: string | null;
+  myName?: string;
+}) {
   const pathname = usePathname();
-
   return (
     <>
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 w-full glass-nav px-4 sm:px-8 py-3.5 mb-8">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          {/* Brand Logo */}
-          <Link href="/" className="group flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-ember to-amber text-white shadow-md shadow-ember/20 transition-transform duration-300 group-hover:scale-105">
-              <Heart className="h-4.5 w-4.5 fill-white/20 animate-pulse-slow" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display text-lg tracking-tight text-ink font-semibold group-hover:text-ember transition-colors">
-                Us, Anyway
-              </span>
-              <span className="text-[10px] font-sans tracking-widest text-ink-muted uppercase -mt-1 font-medium">
-                Two skies • One thread
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5 rounded-2xl bg-paper2/70 p-1.5 border border-line">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative flex items-center gap-2 px-3.5 py-1.5 text-xs font-sans font-medium rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? "text-ember font-semibold"
-                      : "text-ink-muted hover:text-ink hover:bg-paper/50"
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavPill"
-                      className="absolute inset-0 rounded-xl bg-white shadow-sm border border-ember/20"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                  <Icon className={`relative z-10 h-3.5 w-3.5 ${isActive ? "text-ember" : "text-ink-muted"}`} />
-                  <span className="relative z-10">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Partner Live Pill / Status */}
-          <div className="flex items-center gap-2">
-            {partnerName ? (
-              <div className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 border border-emerald-500/20 text-emerald-700 text-xs font-sans font-medium">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[236px] flex-col overflow-y-auto border-r border-line bg-[#fcfbf9] p-6 lg:flex">
+        <Link href="/" className="flex items-center gap-3 pt-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emberDark text-white">
+            <Heart size={20} strokeWidth={1.5} />
+          </span>
+          <div>
+            <span className="font-display text-xl tracking-tight">
+              Us, Anyway<span className="text-ember">.</span>
+            </span>
+            <p className="mt-0.5 text-[9px] uppercase tracking-[.22em] text-ink-muted">
+              A little closer, always
+            </p>
+          </div>
+        </Link>
+        <p className="eyebrow mb-4 mt-10 pl-3">Your shared world</p>
+        <nav aria-label="Main navigation" className="flex flex-col gap-2">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={pathname === href ? "page" : undefined}
+              className={`flex min-h-12 items-center gap-3 rounded-xl px-3.5 text-xs transition-colors ${pathname === href ? "bg-[#efe2e6] font-semibold text-emberDark" : "text-ink-muted hover:bg-paper2 hover:text-ink"}`}
+            >
+              <Icon size={17} strokeWidth={1.6} />
+              <span>{label}</span>
+              {href === "/cycle" && (
+                <span className="ml-auto rounded-md bg-white/70 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-ember">
+                  New
                 </span>
-                <span className="hidden sm:inline">Connected to</span>
-                <span className="font-semibold text-emerald-800">{partnerName}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 rounded-full bg-amber/10 px-3 py-1 border border-amber/20 text-amber text-xs font-sans font-medium">
-                <span className="h-2 w-2 rounded-full bg-amber animate-pulse" />
-                <span>Waiting for partner</span>
-              </div>
-            )}
+              )}
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-auto pt-8">
+          <div className="rounded-2xl border border-[#e6ddd4] bg-[#f3eee7] p-4">
+            <Heart size={17} className="mb-3 text-ember" strokeWidth={1.5} />
+            <p className="font-display text-lg leading-snug">
+              Love is in the
+              <br />
+              <em>little things.</em>
+            </p>
+            <Link
+              href="/notes"
+              className="mt-3 flex items-center gap-1.5 text-[10px] font-medium text-emberDark"
+            >
+              Leave a little love <ArrowUpRight size={12} />
+            </Link>
+          </div>
+          <div className="mt-5 flex items-center gap-3 border-t border-line pt-5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ember/10 font-display text-sm text-emberDark">
+              {myName?.slice(0, 1).toUpperCase() || "U"}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium">
+                {myName || "Your private space"}
+              </p>
+              <p className="mt-1 flex items-center gap-1 text-[9px] text-ink-muted">
+                <LockKeyhole size={9} /> Just for the two of you
+              </p>
+            </div>
           </div>
         </div>
-      </header>
-
-      {/* Mobile Floating Bottom Dock */}
-      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 md:hidden w-[94%] max-w-md">
-        <nav className="flex items-center justify-around rounded-3xl bg-white/80 backdrop-blur-2xl p-2 border border-white/90 shadow-2xl shadow-ember/15">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-2xl text-center transition-all duration-200 ${
-                  isActive ? "text-ember font-bold scale-105" : "text-ink-muted/80 hover:text-ink"
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="mobileActiveDock"
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-ember/15 to-amber/15 border border-ember/25 shadow-sm"
-                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                  />
-                )}
-                <Icon className={`relative z-10 h-5 w-5 ${isActive ? "text-ember" : "text-ink-muted"}`} />
-                <span className="relative z-10 text-[10px] font-sans font-semibold tracking-tight leading-none">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+      </aside>
+      <header className="relative z-30 border-b border-line bg-paper/90 lg:ml-[236px]">
+        <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between gap-3 px-5 sm:px-9 lg:px-12">
+          <Link href="/" className="flex items-center gap-2 lg:hidden">
+            <Heart size={19} className="text-ember" />
+            <span className="font-display text-xl">Us, Anyway.</span>
+          </Link>
+          <span className="hidden items-center gap-2 text-[11px] text-ink-muted lg:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-sage" />
+            Two skies. One little world.
+          </span>
+          <div className="flex items-center gap-2.5 text-[11px] text-ink-muted">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-paper bg-[#e9dce2] font-display text-emberDark">
+              {partnerName?.slice(0, 1).toUpperCase() || <Heart size={12} />}
+            </span>
+            <span className="max-w-[150px] truncate">
+              {partnerName ? `You & ${partnerName}` : "Your story starts here"}
+            </span>
+            <LockKeyhole size={12} className="hidden text-ember sm:block" />
+          </div>
+        </div>
+        <nav
+          aria-label="Main navigation"
+          className="flex gap-1 overflow-x-auto border-t border-line px-4 py-2 lg:hidden"
+        >
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={pathname === href ? "page" : undefined}
+              className={`flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-[11px] ${pathname === href ? "bg-ember/10 font-semibold text-emberDark" : "text-ink-muted"}`}
+            >
+              <Icon size={14} />
+              {label}
+            </Link>
+          ))}
         </nav>
-      </div>
+      </header>
     </>
   );
 }
